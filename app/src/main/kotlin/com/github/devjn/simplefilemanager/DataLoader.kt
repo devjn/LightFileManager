@@ -1,5 +1,8 @@
 package com.github.devjn.simplefilemanager
 
+import android.app.Activity
+import android.util.Log
+import android.widget.Toast
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -19,6 +22,11 @@ object DataLoader {
     }
 
     var listener : DataListener? = null
+
+    fun removeListener(listener: DataListener) {
+        if(this.listener == listener)
+            this.listener == null
+    }
 
     fun loadData(folder: File) {
         val observe = Observable.fromCallable { fill(folder) }
@@ -50,6 +58,26 @@ object DataLoader {
             }
         }
         return dataFiles
+    }
+
+    public fun deleteSelectedFiles(activity: Activity, selectedItems: List<Int>, data: List<FileData>, path: String) {
+        var deletedCount: Int = 0
+        Observable.fromIterable<Int>(selectedItems)
+                .subscribeOn(Schedulers.io())
+                .subscribe({ i ->
+                    try {
+                        val file = File(data.get(i).path)
+                        if (file.delete())
+                            deletedCount++
+                    } catch (e: Exception) {
+                        Log.e(App.TAG, "Failed to delete file" + e)
+                    }
+                }, { e -> Log.e(App.TAG, "Failed to delete file" + e) }, {
+                    activity.runOnUiThread({
+                        Toast.makeText(activity, "$deletedCount files deleted", Toast.LENGTH_SHORT).show()
+                        loadData(File(path))
+                    })
+                })
     }
 
 }

@@ -14,8 +14,7 @@ import android.preference.PreferenceManager;
 
 public class App extends Application {
 
-    private static final String TAG = "Common global application";
-    public static final String PROFILE_ID = "profile_id";
+    public static final String TAG = "SimpleFileManager";
     public static volatile Context applicationContext = null;
 
     private static SharedPreferences prefs;

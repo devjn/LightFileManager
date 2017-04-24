@@ -39,6 +39,7 @@
     <style name="AppPreference.DialogPreference">
         <item name="positiveButtonText">@android:string/ok</item>
         <item name="negativeButtonText">@android:string/cancel</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
 
 </resources>

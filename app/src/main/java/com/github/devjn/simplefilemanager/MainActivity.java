@@ -6,19 +6,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.github.devjn.simplefilemanager.utils.PermissionUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
@@ -36,23 +41,56 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
 
         if (savedInstanceState == null && PermissionUtils.isWriteGranted(this)) {
-            File file = new File(App.getDefaultFolder());
-            Fragment fragment = MainActivityFragment.newInstance(file.getName(), file.getPath());
+            addFragments();
+        }
+
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                ActionBar actionBar = getSupportActionBar();
+                if (actionBar == null) return;
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+                    actionBar.setDisplayHomeAsUpEnabled(true);
+                else actionBar.setDisplayHomeAsUpEnabled(false);
+            }
+        });
+    }
+
+    private void addFragments() {
+        File folder = new File(App.getDefaultFolder());
+        if (!folder.exists() || !folder.isDirectory()) folder = Environment.getExternalStorageDirectory();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        if (!folder.equals(Environment.getExternalStorageDirectory())) {
+            final String parentPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+            String path = folder.getAbsolutePath();
+            Fragment fragment = ListFilesFragment.newInstance(Environment.getExternalStorageDirectory().getName(), parentPath, false);
+            transaction.add(R.id.container, fragment, "parent").commit();
+            ArrayList<File> list = new ArrayList<>();
+            while (path.length() > 1 && !parentPath.equals(path)) {
+                path = path.substring(0, path.lastIndexOf("/"));
+                File folderChild = new File(path);
+                if(!parentPath.equals(path))
+                list.add(folderChild);
+            }
+            Log.i("Main", "list: " + list.size() + " ,content: "+list);
+            Collections.reverse(list);
+            for (File child : list) {
+                fragment = ListFilesFragment.newInstance(child.getName(), child.getAbsolutePath(), false);
+                transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.container, fragment, "child")
+                        .addToBackStack(null)
+                        .commit();
+            }
+            fragment = ListFilesFragment.newInstance(folder.getName(), folder.getAbsolutePath(), true);
+            transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.container, fragment, "main")
+                    .addToBackStack(null).commit();
+        } else {
+            Fragment fragment = ListFilesFragment.newInstance(folder.getName(), folder.getPath(), true);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, fragment, "main")
-                    .addToBackStack(null)
                     .commit();
-
-            getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-                @Override
-                public void onBackStackChanged() {
-                    ActionBar actionBar = getSupportActionBar();
-                    if (actionBar == null) return;
-                    if (getSupportFragmentManager().getBackStackEntryCount() > 1)
-                        actionBar.setDisplayHomeAsUpEnabled(true);
-                    else actionBar.setDisplayHomeAsUpEnabled(false);
-                }
-            });
         }
     }
 
@@ -72,12 +110,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
-        } else if(id == android.R.id.home && getSupportFragmentManager().getBackStackEntryCount() > 1) {
+        } else if(id == android.R.id.home && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStack();
             return true;
         }

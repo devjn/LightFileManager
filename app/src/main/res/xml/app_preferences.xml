@@ -7,9 +7,8 @@
 
         <com.github.devjn.simplefilemanager.utils.DirectoryPrefernces
             style="@style/AppPreference.DialogPreference"
-            android:defaultValue="90"
             android:key="@string/pref_directory"
-            android:title="@string/preferences_directory_title"/>
+            android:summary="@string/preferences_directory_title"/>
 
     </android.support.v7.preference.PreferenceCategory>
 
