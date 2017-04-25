@@ -48,6 +48,9 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         FileData fileData = itemList.get(position);
         String name = fileData.getName();
         holder.name.setText(name);
+        if(name.startsWith("."))
+            holder.picture.setAlpha(0.5f);
+        else holder.picture.setAlpha(1.0f);
         if (fileData.isFolder())
             holder.picture.setImageResource(R.drawable.ic_folder);
         else if (Utils.isImage(name))

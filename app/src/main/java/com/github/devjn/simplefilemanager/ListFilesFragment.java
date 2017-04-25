@@ -255,11 +255,13 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
         switch (item.getItemId()) {
             case R.id.action_delete:
                 final List<Integer> selectedItemPositions = mAdapter.getSelectedItems();
-                int size = selectedItemPositions.size();
+                final int size = selectedItemPositions.size();
+                final int items = countItems(selectedItemPositions);
 
                 AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
                 alert.setTitle(getString(R.string.action_delete));
-                alert.setMessage(getResources().getQuantityString(R.plurals.delete_confirmation, size, size));
+                alert.setMessage(items > 0 ? getResources().getQuantityString(R.plurals.delete_content_confirmation, size, size, items)
+                        :getResources().getQuantityString(R.plurals.delete_confirmation, size, size));
                 alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -286,6 +288,16 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
         this.actionMode = null;
         mAdapter.clearSelections();
         mSelectedActionItems.clear();
+    }
+
+    private int countItems(List<Integer> selectedItemPositions) {
+        int deleteCount = 0;
+        for (Integer pos: selectedItemPositions) {
+            FileData data = mData.get(pos);
+            if(data.isFolder())
+                deleteCount += data.getSize();
+        }
+        return  deleteCount;
     }
 
 }

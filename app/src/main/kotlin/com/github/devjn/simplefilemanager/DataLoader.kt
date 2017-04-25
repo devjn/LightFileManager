@@ -67,8 +67,7 @@ object DataLoader {
                 .subscribe({ i ->
                     try {
                         val file = File(data.get(i).path)
-                        if (file.delete())
-                            deletedCount++
+                            deletedCount = deleteRecursive(file)
                     } catch (e: Exception) {
                         Log.e(App.TAG, "Failed to delete file" + e)
                     }
@@ -78,6 +77,17 @@ object DataLoader {
                         loadData(File(path))
                     })
                 })
+    }
+
+    fun deleteRecursive(fileOrDirectory: File): Int {
+        var deletedCount: Int = 0
+        if (fileOrDirectory.isDirectory)
+            for (child in fileOrDirectory.listFiles())
+                deletedCount += deleteRecursive(child)
+
+        if (fileOrDirectory.delete())
+            return ++deletedCount
+        return deletedCount
     }
 
 }
