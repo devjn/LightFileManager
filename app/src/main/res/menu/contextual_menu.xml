@@ -18,4 +18,11 @@
         android:titleCondensed="Delete"
         app:showAsAction="ifRoom|withText">
     </item>
+
+    <item
+        android:id="@+id/action_details"
+        android:orderInCategory="300"
+        android:title="@string/action_details"
+        app:showAsAction="never">
+    </item>
 </menu>

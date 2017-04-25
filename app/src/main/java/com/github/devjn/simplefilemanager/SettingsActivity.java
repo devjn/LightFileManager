@@ -66,6 +66,12 @@ public class SettingsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+            super.onBackPressed();
+        else NavUtils.navigateUpFromSameTask(this);
+    }
 
     public static class GeneralPreferenceFragment extends PreferenceFragmentCompat {
 

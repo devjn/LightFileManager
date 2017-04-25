@@ -38,4 +38,8 @@ public class App extends Application {
         return prefs.getString(DEF_FOLDER, Environment.getExternalStorageDirectory().getAbsolutePath());
     }
 
+    public static boolean getShowFolderCount() {
+        return prefs.getBoolean(applicationContext.getString(R.string.pref_folder_count), true);
+    }
+
 }

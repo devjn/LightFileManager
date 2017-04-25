@@ -1,11 +1,14 @@
 package com.github.devjn.simplefilemanager;
 
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
@@ -14,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.devjn.simplefilemanager.utils.IntentUtils;
@@ -29,6 +34,7 @@ import com.github.devjn.simplefilemanager.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,7 +108,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
         android.support.v7.app.ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (ab != null) {
             ab.setTitle(mName);
-            if(getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
+            if (getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
                 ab.setDisplayHomeAsUpEnabled(true);
         }
 
@@ -293,12 +299,13 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
                     FileData fileData = mData.get(selectedSharePositions.get(0));
                     IntentUtils.shareFile(getActivity(), fileData);
                 } else {
-                    List<FileData> list = new ArrayList<>(selectedSharePositions.size());
-                    for (Integer pos : selectedSharePositions) {
-                        list.add(mData.get(pos));
-                    }
-                    IntentUtils.shareFiles(getActivity(), list);
+                    IntentUtils.shareFiles(getActivity(), getSelectedData(selectedSharePositions));
                 }
+                actionMode.finish();
+                return true;
+            case R.id.action_details:
+                DetailsDialogFragment.newInstance(getSelectedData(mAdapter.getSelectedItems()))
+                        .show(getActivity().getSupportFragmentManager(), "details");
                 actionMode.finish();
                 return true;
             default:
@@ -313,6 +320,14 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
         mSelectedActionItems.clear();
     }
 
+    private List<FileData> getSelectedData(List<Integer> positions) {
+        List<FileData> list = new ArrayList<>(positions.size());
+        for (Integer pos : positions) {
+            list.add(mData.get(pos));
+        }
+        return list;
+    }
+
     private int countItems(List<Integer> selectedItemPositions) {
         int deleteCount = 0;
         for (Integer pos : selectedItemPositions) {
@@ -321,6 +336,73 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
                 deleteCount += data.getSize();
         }
         return deleteCount;
+    }
+
+
+    public static class DetailsDialogFragment extends DialogFragment {
+
+        public static DetailsDialogFragment newInstance(List<FileData> datas) {
+            DetailsDialogFragment fragment = new DetailsDialogFragment();
+            Bundle args = new Bundle();
+            args.putSerializable("list", (Serializable) datas);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        private View mRootView;
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            mRootView = getActivity().getLayoutInflater().inflate(R.layout.fragment_file_details, null);
+
+            try {
+                initViews();
+            } catch (Exception e) {
+                Log.e(TAG, "Error while initializing dialog: " + e);
+                dismiss();
+            }
+
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Dialog_CenterTitle)
+                    .setView(mRootView)
+                    .setTitle(getString(R.string.action_details))
+                    .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dismiss();
+                        }
+                    });
+            return alertDialog.create();
+        }
+
+        private void initViews() {
+            Bundle args = getArguments();
+            if (args == null || !args.containsKey("list")) dismiss();
+            List<FileData> dataList = (List<FileData>) args.getSerializable("list");
+            boolean isMultiple = dataList.size() > 1;
+            FileData data = dataList.get(0);
+
+            TextView name = (TextView) mRootView.findViewById(R.id.name);
+            TextView type = (TextView) mRootView.findViewById(R.id.type);
+            TextView path = (TextView) mRootView.findViewById(R.id.path);
+            TextView size = (TextView) mRootView.findViewById(R.id.size);
+
+            path.setText(data.getPath());
+
+            if (isMultiple) {
+                name.setText(getString(R.string.multiple_files));
+                type.setText(getString(R.string.multiple_files));
+                long totalSize = 0;
+                for (FileData fileData : dataList) {
+                    totalSize += Utils.getFileSize(new File(fileData.getPath()));
+                }
+                size.setText(Utils.humanReadableByteCount(totalSize, true));
+            } else {
+                name.setText(data.getName());
+                type.setText(getString(data.isFolder() ? R.string.folder : R.string.file));
+                size.setText(Utils.humanReadableByteCount(Utils.getFileSize(new File(data.getPath())), true));
+            }
+        }
+
     }
 
 }

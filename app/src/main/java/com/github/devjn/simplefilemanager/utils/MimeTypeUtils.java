@@ -111,6 +111,11 @@ public class MimeTypeUtils {
         return type != null && type.startsWith("video");
     }
 
+    public static boolean isAudio(@NonNull String extension) {
+        String type = getType(extension);
+        return type != null && type.startsWith("audio");
+    }
+
     public static boolean isImageFile(@NonNull String filename) {
         return getType(Utils.fileExt(filename)).startsWith("image");
     }

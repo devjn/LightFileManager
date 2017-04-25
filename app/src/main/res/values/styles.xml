@@ -7,6 +7,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
+        <item name="actionModeBackground">@color/colorPrimaryDark</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+
         <!-- Theme for the Preferences -->
         <item name="preferenceTheme">@style/AppPreferenceTheme</item>
     </style>
@@ -38,6 +41,14 @@
     <style name="TextAppearance.AppTheme.Caption.Inverse" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
         <item name="android:textColorHint">?android:attr/textColorHintInverse</item>
+    </style>
+
+    <style name="AppTheme.Dialog.CenterTitle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowTitleStyle">@style/DialogWindowTitle</item>
+    </style>
+
+    <style name="DialogWindowTitle" parent="Base.DialogWindowTitle.AppCompat">
+        <item name="android:gravity">center</item>
     </style>
 
     <!-- Style for a DialogPreference Entry -->

@@ -2,13 +2,15 @@ package com.github.devjn.simplefilemanager;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
+
 /**
  * Created by @author Jahongir on 24-Apr-17
  * devjn@jn-arts.com
  * FileData
  */
 
-public class FileData implements Comparable {
+public class FileData implements Comparable, Serializable {
 
     private boolean isFolder;
     private String name;

@@ -32,12 +32,15 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
     private FilesClickListener clickListener;
     private SparseBooleanArray selectedItems;
 
+    private boolean showCount;
+
     public FileListAdapter(Context context, FilesClickListener clickListener, List<FileData> itemList, boolean isPortrait) {
         this.context = context;
         this.itemList = itemList;
         this.isPortrait = isPortrait;
         this.clickListener = clickListener;
         selectedItems = new SparseBooleanArray();
+        showCount = App.getShowFolderCount();
     }
 
     @Override
@@ -58,7 +61,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         holder.size.setText("");
         if (fileData.isFolder()) {
             holder.picture.setImageResource(R.drawable.ic_folder);
-            holder.size.setText(String.valueOf(fileData.getSize()));
+            if(showCount) holder.size.setText(String.valueOf(fileData.getSize()));
         } else if(ext != null && !ext.isEmpty()) {
             if (MimeTypeUtils.isImage(ext) || MimeTypeUtils.isVideo(ext))
                 Glide.with(context).load(fileData.getPath()).asBitmap().into(holder.picture);
@@ -80,7 +83,8 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
                 imageView.setImageResource(R.drawable.ic_file_html); break;
             case "zip":
                 imageView.setImageResource(R.drawable.ic_file_zip); break;
-            default: imageView.setImageResource(R.drawable.ic_file);
+            default: if(MimeTypeUtils.isAudio(ext)) imageView.setImageResource(R.drawable.ic_file_audio);
+                else imageView.setImageResource(R.drawable.ic_file);
         }
     }
 

@@ -10,6 +10,11 @@
             android:key="@string/pref_directory"
             android:summary="@string/preferences_directory_title"/>
 
+        <android.support.v7.preference.CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_folder_count"
+            android:title="@string/preferences_folder_count"/>
+
     </android.support.v7.preference.PreferenceCategory>
 
 </android.support.v7.preference.PreferenceScreen>
