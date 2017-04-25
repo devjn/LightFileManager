@@ -10,10 +10,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.github.devjn.simplefilemanager.utils.MimeTypeUtils;
 import com.github.devjn.simplefilemanager.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.devjn.simplefilemanager.R.id.imageView;
 
 /**
  * Created by @author Jahongir on 24-Apr-17
@@ -47,23 +50,24 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
     public void onBindViewHolder(RecyclerViewHolders holder, int position) {
         FileData fileData = itemList.get(position);
         String name = fileData.getName();
+        String ext = Utils.fileExt(name);
         holder.name.setText(name);
         if(name.startsWith("."))
             holder.picture.setAlpha(0.5f);
         else holder.picture.setAlpha(1.0f);
-        if (fileData.isFolder())
+        holder.size.setText("");
+        if (fileData.isFolder()) {
             holder.picture.setImageResource(R.drawable.ic_folder);
-        else if (Utils.isImage(name))
-            Glide.with(context).load(fileData.getPath()).asBitmap().into(holder.picture);
-        else setAppropriateIcon(Utils.fileExt(name), holder.picture);
+            holder.size.setText(String.valueOf(fileData.getSize()));
+        } else if(ext != null && !ext.isEmpty()) {
+            if (MimeTypeUtils.isImage(ext) || MimeTypeUtils.isVideo(ext))
+                Glide.with(context).load(fileData.getPath()).asBitmap().into(holder.picture);
+            else setAppropriateIcon(ext, holder.picture);
+        } else holder.picture.setImageResource(R.drawable.ic_file);
         holder.itemView.setActivated(selectedItems.get(position, false));
     }
 
     private void setAppropriateIcon(String ext, ImageView imageView) {
-        if(ext == null || ext.isEmpty()) {
-            imageView.setImageResource(R.drawable.ic_file);
-            return;
-        }
         switch (ext) {
             case "doc":
             case "docx":
@@ -121,6 +125,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
     class RecyclerViewHolders extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         TextView name;
+        TextView size;
         ImageView picture;
 
         public RecyclerViewHolders(View itemView) {
@@ -128,7 +133,8 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
             name = (TextView) itemView.findViewById(R.id.name);
-            picture = (ImageView) itemView.findViewById(R.id.imageView);
+            size = (TextView) itemView.findViewById(R.id.size);
+            picture = (ImageView) itemView.findViewById(imageView);
         }
 
         @Override

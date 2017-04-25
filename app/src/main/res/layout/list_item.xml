@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.github.devjn.simplefilemanager.utils.ForegroundLinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -10,11 +9,27 @@
     android:orientation="horizontal"
     android:padding="@dimen/normal_padding">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        tools:src="@drawable/ic_file"/>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            tools:src="@drawable/ic_file"/>
+
+        <TextView
+            android:id="@+id/size"
+            style="@style/TextAppearance.AppTheme.Caption.Inverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:paddingBottom="8dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            tools:text="0"/>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/name"

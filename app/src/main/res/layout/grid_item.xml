@@ -9,13 +9,29 @@
     android:orientation="vertical"
     android:padding="@dimen/normal_padding">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:gravity="center"
-        android:scaleType="centerCrop"
-        tools:src="@drawable/ic_file"/>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:gravity="center"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ic_file"/>
+
+        <TextView
+            android:id="@+id/size"
+            style="@style/TextAppearance.AppTheme.Caption.Inverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            tools:text="0"/>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/name"

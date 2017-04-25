@@ -4,12 +4,10 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ShareCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -25,12 +23,12 @@ import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
+import com.github.devjn.simplefilemanager.utils.IntentUtils;
 import com.github.devjn.simplefilemanager.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +78,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
         if (args != null && args.containsKey(FOLDER_KEY)) {
             mPath = args.getString(FOLDER_KEY);
             mName = args.getString(NAME_KEY, "");
-            if(!args.getBoolean(LOAD)) return;
+            if (!args.getBoolean(LOAD)) return;
             if (mPath != null && !mPath.isEmpty())
                 DataLoader.INSTANCE.loadData(new File(mPath));
         }
@@ -101,9 +99,12 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        android.support.v7.app.ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if (ab != null)
+        android.support.v7.app.ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (ab != null) {
             ab.setTitle(mName);
+            if(getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
+                ab.setDisplayHomeAsUpEnabled(true);
+        }
 
         mAdapter = new FileListAdapter(getContext(), this, mData,
                 getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
@@ -111,7 +112,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
 
         if (savedInstanceState != null) {
             try {
-                mSelectedActionItems = (ArrayList<Integer>) savedInstanceState.getSerializable("SelectedActionItems");
+                mSelectedActionItems = savedInstanceState.getIntegerArrayList("SelectedActionItems");
                 if (mSelectedActionItems != null && !mSelectedActionItems.isEmpty()) {
                     actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(ListFilesFragment.this);
                     restoreActionMode();
@@ -139,7 +140,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("SelectedActionItems", (Serializable) mSelectedActionItems);
+        outState.putIntegerArrayList("SelectedActionItems", (ArrayList<Integer>) mSelectedActionItems);
     }
 
     @Override
@@ -206,10 +207,11 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
             MimeTypeMap myMime = MimeTypeMap.getSingleton();
             Intent newIntent = new Intent(Intent.ACTION_VIEW);
             String mimeType = myMime.getMimeTypeFromExtension(Utils.fileExt(fileData.getPath().substring(1)));
-            newIntent.setDataAndType(Uri.fromFile(folder), mimeType);
+            newIntent.setDataAndType(FileProvider.getUriForFile(getActivity(), FILES_AUTHORITY, folder), mimeType);
+            newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             try {
-                getContext().startActivity(newIntent);
+                startActivity(newIntent);
             } catch (ActivityNotFoundException e) {
                 Toast.makeText(getContext(), "No handler for this type of file.", Toast.LENGTH_LONG).show();
             }
@@ -221,7 +223,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
         if (actionMode != null)
             return false;
         // Start the CAB using the ActionMode.Callback defined above
-        actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(ListFilesFragment.this);
+        actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(ListFilesFragment.this);
         toggleSelection(position);
         return true;
     }
@@ -229,16 +231,10 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     private void toggleSelection(int position) {
         mSelectedActionItems.add(position);
         mAdapter.toggleSelection(position);
-        String title = getString(R.string.selected_count, mAdapter.getSelectedItemCount());
+        int count = mAdapter.getSelectedItemCount();
+        String title = getString(R.string.selected_count, count);
         actionMode.setTitle(title);
-        MenuItem shareItem = actionMode.getMenu().findItem(R.id.action_share);
-        if(mAdapter.getSelectedItemCount() > 1) {
-            shareItem.setEnabled(false);
-            shareItem.setVisible(false);
-        } else {
-            shareItem.setEnabled(true);
-            shareItem.setVisible(true);
-        }
+        if (count <= 0) actionMode.finish();
     }
 
 
@@ -273,7 +269,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
                 AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
                 alert.setTitle(getString(R.string.action_delete));
                 alert.setMessage(items > 0 ? getResources().getQuantityString(R.plurals.delete_content_confirmation, size, size, items)
-                        :getResources().getQuantityString(R.plurals.delete_confirmation, size, size));
+                        : getResources().getQuantityString(R.plurals.delete_confirmation, size, size));
                 alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -291,23 +287,20 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
                 actionMode.finish();
                 return true;
             case R.id.action_share:
-                final List<Integer> selectedItemPosition = mAdapter.getSelectedItems();
-                if(selectedItemPosition.isEmpty()) return false;
-                FileData fileData = mData.get(mAdapter.getSelectedItems().get(0));
-                File file = new File(fileData.getPath());
-                Uri uriToShare = FileProvider.getUriForFile(
-                        getActivity(), FILES_AUTHORITY, file);
-                MimeTypeMap myMime = MimeTypeMap.getSingleton();
-                String mimeType = myMime.getMimeTypeFromExtension(Utils.fileExt(fileData.getPath().substring(1)));
-                Intent shareIntent = ShareCompat.IntentBuilder.from(getActivity())
-                        .setType(mimeType)
-                        .setStream(uriToShare)
-                        .getIntent();
-                shareIntent.setData(uriToShare);
-                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                if (shareIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    startActivity(shareIntent);
+                final List<Integer> selectedSharePositions = mAdapter.getSelectedItems();
+                if (selectedSharePositions.isEmpty()) return false;
+                if (selectedSharePositions.size() == 1) {
+                    FileData fileData = mData.get(selectedSharePositions.get(0));
+                    IntentUtils.shareFile(getActivity(), fileData);
+                } else {
+                    List<FileData> list = new ArrayList<>(selectedSharePositions.size());
+                    for (Integer pos : selectedSharePositions) {
+                        list.add(mData.get(pos));
+                    }
+                    IntentUtils.shareFiles(getActivity(), list);
                 }
+                actionMode.finish();
+                return true;
             default:
                 return false;
         }
@@ -322,12 +315,12 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
 
     private int countItems(List<Integer> selectedItemPositions) {
         int deleteCount = 0;
-        for (Integer pos: selectedItemPositions) {
+        for (Integer pos : selectedItemPositions) {
             FileData data = mData.get(pos);
-            if(data.isFolder())
+            if (data.isFolder())
                 deleteCount += data.getSize();
         }
-        return  deleteCount;
+        return deleteCount;
     }
 
 }

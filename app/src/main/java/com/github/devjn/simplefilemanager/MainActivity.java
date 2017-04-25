@@ -26,7 +26,7 @@ import java.util.Collections;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
     private static int REQUEST_WRITE = 100;
 
@@ -42,22 +42,24 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null && PermissionUtils.isWriteGranted(this)) {
             addFragments();
         }
+    }
 
-        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-            @Override
-            public void onBackStackChanged() {
-                ActionBar actionBar = getSupportActionBar();
-                if (actionBar == null) return;
-                if (getSupportFragmentManager().getBackStackEntryCount() > 0)
-                    actionBar.setDisplayHomeAsUpEnabled(true);
-                else actionBar.setDisplayHomeAsUpEnabled(false);
-            }
-        });
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        getSupportFragmentManager().removeOnBackStackChangedListener(this);
     }
 
     private void addFragments() {
         File folder = new File(App.getDefaultFolder());
-        if (!folder.exists() || !folder.isDirectory()) folder = Environment.getExternalStorageDirectory();
+        if (!folder.exists() || !folder.isDirectory())
+            folder = Environment.getExternalStorageDirectory();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         if (!folder.equals(Environment.getExternalStorageDirectory())) {
@@ -69,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
             while (path.length() > 1 && !parentPath.equals(path)) {
                 path = path.substring(0, path.lastIndexOf("/"));
                 File folderChild = new File(path);
-                if(!parentPath.equals(path))
-                list.add(folderChild);
+                if (!parentPath.equals(path))
+                    list.add(folderChild);
             }
             Collections.reverse(list);
             for (File child : list) {
@@ -112,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
-        } else if(id == android.R.id.home && getSupportFragmentManager().getBackStackEntryCount() > 0) {
+        } else if (id == android.R.id.home && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStack();
             return true;
         }
@@ -145,4 +147,12 @@ public class MainActivity extends AppCompatActivity {
         Runtime.getRuntime().exit(0);
     }
 
+    @Override
+    public void onBackStackChanged() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null) return;
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        else actionBar.setDisplayHomeAsUpEnabled(false);
+    }
 }

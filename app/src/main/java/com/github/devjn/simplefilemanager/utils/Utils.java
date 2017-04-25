@@ -29,19 +29,6 @@ public class Utils {
         }
     }
 
-    private static String[] imgExt = {"gif", "jpe", "jpeg", "jpg", "png"};
-
-    public static Boolean isImage(String name) {
-        String ext = fileExt(name);
-        if (ext != null)
-            for (String anImgExt : imgExt) {
-                if (ext.contains(anImgExt)) {
-                    return true;
-                }
-            }
-        return false;
-    }
-
     public static int calculateNoOfColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
