@@ -5,13 +5,13 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -37,8 +37,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.github.devjn.simplefilemanager.App.FILES_AUTHORITY;
 
 
 public class ListFilesFragment extends Fragment implements DataLoader.DataListener, FileListAdapter.FilesClickListener, ActionMode.Callback {
@@ -213,7 +211,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
             MimeTypeMap myMime = MimeTypeMap.getSingleton();
             Intent newIntent = new Intent(Intent.ACTION_VIEW);
             String mimeType = myMime.getMimeTypeFromExtension(Utils.fileExt(fileData.getPath().substring(1)));
-            newIntent.setDataAndType(FileProvider.getUriForFile(getActivity(), FILES_AUTHORITY, folder), mimeType);
+            newIntent.setDataAndType(Uri.fromFile(folder), mimeType);
             newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             try {
