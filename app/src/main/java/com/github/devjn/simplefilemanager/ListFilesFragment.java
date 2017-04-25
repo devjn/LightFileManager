@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ShareCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -31,6 +33,8 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.devjn.simplefilemanager.App.FILES_AUTHORITY;
 
 
 public class ListFilesFragment extends Fragment implements DataLoader.DataListener, FileListAdapter.FilesClickListener, ActionMode.Callback {
@@ -227,6 +231,14 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
         mAdapter.toggleSelection(position);
         String title = getString(R.string.selected_count, mAdapter.getSelectedItemCount());
         actionMode.setTitle(title);
+        MenuItem shareItem = actionMode.getMenu().findItem(R.id.action_share);
+        if(mAdapter.getSelectedItemCount() > 1) {
+            shareItem.setEnabled(false);
+            shareItem.setVisible(false);
+        } else {
+            shareItem.setEnabled(true);
+            shareItem.setVisible(true);
+        }
     }
 
 
@@ -278,6 +290,24 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
                 alert.show();
                 actionMode.finish();
                 return true;
+            case R.id.action_share:
+                final List<Integer> selectedItemPosition = mAdapter.getSelectedItems();
+                if(selectedItemPosition.isEmpty()) return false;
+                FileData fileData = mData.get(mAdapter.getSelectedItems().get(0));
+                File file = new File(fileData.getPath());
+                Uri uriToShare = FileProvider.getUriForFile(
+                        getActivity(), FILES_AUTHORITY, file);
+                MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                String mimeType = myMime.getMimeTypeFromExtension(Utils.fileExt(fileData.getPath().substring(1)));
+                Intent shareIntent = ShareCompat.IntentBuilder.from(getActivity())
+                        .setType(mimeType)
+                        .setStream(uriToShare)
+                        .getIntent();
+                shareIntent.setData(uriToShare);
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                if (shareIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(shareIntent);
+                }
             default:
                 return false;
         }

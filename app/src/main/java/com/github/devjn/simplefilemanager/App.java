@@ -17,6 +17,8 @@ public class App extends Application {
     public static final String TAG = "SimpleFileManager";
     public static volatile Context applicationContext = null;
 
+    public static String FILES_AUTHORITY = BuildConfig.APPLICATION_ID+".fileprovider";
+
     private static SharedPreferences prefs;
 
     private static String DEF_FOLDER = "DEF_FOLDER";

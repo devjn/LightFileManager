@@ -55,8 +55,29 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
             holder.picture.setImageResource(R.drawable.ic_folder);
         else if (Utils.isImage(name))
             Glide.with(context).load(fileData.getPath()).asBitmap().into(holder.picture);
-        else holder.picture.setImageResource(R.drawable.ic_file);
+        else setAppropriateIcon(Utils.fileExt(name), holder.picture);
         holder.itemView.setActivated(selectedItems.get(position, false));
+    }
+
+    private void setAppropriateIcon(String ext, ImageView imageView) {
+        if(ext == null || ext.isEmpty()) {
+            imageView.setImageResource(R.drawable.ic_file);
+            return;
+        }
+        switch (ext) {
+            case "doc":
+            case "docx":
+                imageView.setImageResource(R.drawable.ic_file_doc); break;
+            case "pdf":
+                imageView.setImageResource(R.drawable.ic_file_pdf); break;
+            case "txt":
+                imageView.setImageResource(R.drawable.ic_file_txt); break;
+            case "html":
+                imageView.setImageResource(R.drawable.ic_file_html); break;
+            case "zip":
+                imageView.setImageResource(R.drawable.ic_file_zip); break;
+            default: imageView.setImageResource(R.drawable.ic_file);
+        }
     }
 
     @Override

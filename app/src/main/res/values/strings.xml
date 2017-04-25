@@ -33,7 +33,7 @@
     <string name="permission_rationale_location">Access to write is required to show and modify files.</string>
     <string name="write_permission_denied">This app requires write permission to work with files. Please try again and grant access to write access.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Simple File Manager\'.</string>
     <string name="permission_required_toast">Write permission is required for this app.</string>
-
+    <string name="action_share">Share</string>
 
 
 </resources>
