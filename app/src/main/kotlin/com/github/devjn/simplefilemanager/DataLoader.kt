@@ -3,6 +3,7 @@ package com.github.devjn.simplefilemanager
 import android.app.Activity
 import android.util.Log
 import android.widget.Toast
+import com.github.devjn.simplefilemanager.common.FileData
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

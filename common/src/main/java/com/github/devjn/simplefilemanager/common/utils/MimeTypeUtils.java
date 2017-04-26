@@ -1,8 +1,8 @@
-package com.github.devjn.simplefilemanager.utils;
-
-import android.support.annotation.NonNull;
+package com.github.devjn.simplefilemanager.common.utils;
 
 import java.util.HashMap;
+
+import io.reactivex.annotations.NonNull;
 
 /**
  * Created by @author Jahongir on 21 Mar 2017

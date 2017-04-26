@@ -1,0 +1,16 @@
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    // kotlin std lib
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    compile 'io.reactivex.rxjava2:rxjava:2.0.8'
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7

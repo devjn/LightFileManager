@@ -7,7 +7,8 @@ import android.support.v4.app.ShareCompat;
 import android.support.v4.content.FileProvider;
 import android.webkit.MimeTypeMap;
 
-import com.github.devjn.simplefilemanager.FileData;
+import com.github.devjn.simplefilemanager.common.FileData;
+import com.github.devjn.simplefilemanager.common.utils.Utils;
 
 import java.io.File;
 import java.util.ArrayList;

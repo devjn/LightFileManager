@@ -10,8 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.github.devjn.simplefilemanager.utils.MimeTypeUtils;
-import com.github.devjn.simplefilemanager.utils.Utils;
+import com.github.devjn.simplefilemanager.common.FileData;
+import com.github.devjn.simplefilemanager.common.utils.MimeTypeUtils;
+import com.github.devjn.simplefilemanager.common.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;

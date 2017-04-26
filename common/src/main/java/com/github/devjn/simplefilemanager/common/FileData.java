@@ -1,6 +1,6 @@
-package com.github.devjn.simplefilemanager;
+package com.github.devjn.simplefilemanager.common;
 
-import android.support.annotation.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -51,7 +51,7 @@ public class FileData implements Comparable, Serializable {
     }
 
     @Override
-    public int compareTo(@NonNull Object obj) {
+    public int compareTo(@NotNull Object obj) {
         if(!(obj instanceof FileData)) return 0;
         FileData data = (FileData) obj;
         if(data.isFolder && !isFolder)

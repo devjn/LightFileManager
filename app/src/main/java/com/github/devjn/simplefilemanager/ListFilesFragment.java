@@ -28,8 +28,9 @@ import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.devjn.simplefilemanager.common.FileData;
+import com.github.devjn.simplefilemanager.common.utils.Utils;
 import com.github.devjn.simplefilemanager.utils.IntentUtils;
-import com.github.devjn.simplefilemanager.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -94,7 +95,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
 
         mRecyclerView = (RecyclerView) mRootView.findViewById(R.id.list);
         mLayoutManager = new GridLayoutManager(getContext(), getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? 1
-                : Utils.calculateNoOfColumns(getContext()), GridLayoutManager.VERTICAL, false);
+                : App.calculateNoOfColumns(getContext()), GridLayoutManager.VERTICAL, false);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
         return mRootView;

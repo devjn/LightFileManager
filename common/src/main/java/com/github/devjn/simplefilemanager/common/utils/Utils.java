@@ -1,7 +1,4 @@
-package com.github.devjn.simplefilemanager.utils;
-
-import android.content.Context;
-import android.util.DisplayMetrics;
+package com.github.devjn.simplefilemanager.common.utils;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -32,13 +29,6 @@ public class Utils {
             }
             return ext.toLowerCase();
         }
-    }
-
-    public static int calculateNoOfColumns(Context context) {
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int noOfColumns = (int) (dpWidth / 110);
-        return noOfColumns;
     }
 
     public static String humanReadableByteCount(long bytes, boolean si) {
