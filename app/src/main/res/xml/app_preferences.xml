@@ -13,7 +13,7 @@
         <android.support.v7.preference.CheckBoxPreference
             android:defaultValue="true"
             android:key="@string/pref_folder_count"
-            android:title="@string/preferences_folder_count"/>
+            android:summary="@string/preferences_folder_count"/>
 
     </android.support.v7.preference.PreferenceCategory>
 

@@ -55,6 +55,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         String name = fileData.getName();
         String ext = Utils.fileExt(name);
         holder.name.setText(name);
+        holder.name.setTextSize(14);
         if(name.startsWith("."))
             holder.picture.setAlpha(0.5f);
         else holder.picture.setAlpha(1.0f);

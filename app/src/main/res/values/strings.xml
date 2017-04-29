@@ -47,6 +47,7 @@
     <string name="folder">Folder</string>
     <string name="file">File</string>
     <string name="ok">Ok</string>
+    <string name="share_via">Share via</string>
 
 
 </resources>

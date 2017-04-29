@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -210,10 +211,11 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
             File folder = new File(fileData.getPath());
             MimeTypeMap myMime = MimeTypeMap.getSingleton();
             Intent newIntent = new Intent(Intent.ACTION_VIEW);
+            newIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             String mimeType = myMime.getMimeTypeFromExtension(Utils.fileExt(fileData.getPath().substring(1)));
-            newIntent.setDataAndType(Uri.fromFile(folder), mimeType);
+            Uri openUri = FileProvider.getUriForFile(getActivity(), App.applicationContext.getPackageName() + ".fileprovider", folder);
+            newIntent.setDataAndType(openUri, mimeType);
             newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             try {
                 startActivity(newIntent);
             } catch (ActivityNotFoundException e) {

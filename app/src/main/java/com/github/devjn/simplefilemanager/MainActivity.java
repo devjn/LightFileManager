@@ -1,10 +1,12 @@
 package com.github.devjn.simplefilemanager;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -94,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     private void checkPermissions() {
         if (!PermissionUtils.isWriteGranted(this))
             PermissionUtils.requestPermission(this, REQUEST_WRITE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -122,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         return false;
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

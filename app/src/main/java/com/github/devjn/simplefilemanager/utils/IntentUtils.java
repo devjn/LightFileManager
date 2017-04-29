@@ -8,6 +8,7 @@ import android.support.v4.content.FileProvider;
 import android.webkit.MimeTypeMap;
 
 import com.github.devjn.simplefilemanager.FileData;
+import com.github.devjn.simplefilemanager.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class IntentUtils {
         shareIntent.setData(uriToShare);
 //        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         if (shareIntent.resolveActivity(activity.getPackageManager()) != null) {
-            activity.startActivity(shareIntent);
+            activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.share_via)));
         }
     }
 
@@ -44,8 +45,8 @@ public class IntentUtils {
     public static void shareFiles(Activity activity, List<FileData> datas) {
         ArrayList<Uri> files = new ArrayList<Uri>();
 
-        for(FileData data : datas) {
-            if(data.isFolder()) continue;
+        for (FileData data : datas) {
+            if (data.isFolder()) continue;
             File file = new File(data.getPath());
             Uri uri = FileProvider.getUriForFile(
                     activity, FILES_AUTHORITY, file);
@@ -58,7 +59,7 @@ public class IntentUtils {
         shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
 //        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         if (shareIntent.resolveActivity(activity.getPackageManager()) != null) {
-            activity.startActivity(shareIntent);
+            activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.share_via)));
         }
     }
 
