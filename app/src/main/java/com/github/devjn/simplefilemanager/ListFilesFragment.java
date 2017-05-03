@@ -1,18 +1,14 @@
 package com.github.devjn.simplefilemanager;
 
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -25,7 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -208,17 +203,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
                     .addToBackStack(null)
                     .commit();
         } else {
-            File folder = new File(fileData.getPath());
-            MimeTypeMap myMime = MimeTypeMap.getSingleton();
-            Intent newIntent = new Intent(Intent.ACTION_VIEW);
-            newIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            String mimeType = myMime.getMimeTypeFromExtension(Utils.fileExt(fileData.getPath().substring(1)));
-            Uri openUri = FileProvider.getUriForFile(getActivity(), App.applicationContext.getPackageName() + ".fileprovider", folder);
-            newIntent.setDataAndType(openUri, mimeType);
-            newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            try {
-                startActivity(newIntent);
-            } catch (ActivityNotFoundException e) {
+            if(!IntentUtils.openFile(getContext(), fileData)) {
                 Toast.makeText(getContext(), "No handler for this type of file.", Toast.LENGTH_LONG).show();
             }
         }
