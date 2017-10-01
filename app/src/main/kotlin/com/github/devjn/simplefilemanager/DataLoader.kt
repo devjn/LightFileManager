@@ -25,7 +25,7 @@ object DataLoader {
 
     fun removeListener(listener: DataListener) {
         if(this.listener == listener)
-            this.listener == null
+            this.listener = null
     }
 
     fun loadData(folder: File) {
@@ -60,7 +60,7 @@ object DataLoader {
         return dataFiles
     }
 
-    public fun deleteSelectedFiles(activity: Activity, selectedItems: List<Int>, data: List<FileData>, path: String) {
+    fun deleteSelectedFiles(activity: Activity, selectedItems: List<Int>, data: List<FileData>, path: String) {
         var deletedCount: Int = 0
         Observable.fromIterable<Int>(selectedItems)
                 .subscribeOn(Schedulers.io())

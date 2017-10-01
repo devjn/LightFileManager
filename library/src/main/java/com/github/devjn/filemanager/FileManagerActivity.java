@@ -1,9 +1,24 @@
-package com.github.devjn.simplefilemanager;
+/*
+ * Copyright 2017 devjn
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.github.devjn.filemanager;
 
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -19,10 +34,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.github.devjn.filemanager.FileManager;
-import com.github.devjn.simplefilemanager.utils.PermissionUtils;
+import com.github.devjn.filemanager.utils.PermissionUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,14 +43,14 @@ import java.util.Collections;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
-public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
+public class FileManagerActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
     private static int REQUEST_WRITE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_file_manager);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -61,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
     private void addFragments() {
-        File folder = new File(App.getDefaultFolder());
+        File folder = new File(Manager.getDefaultFolder());
         if (!folder.exists() || !folder.isDirectory())
             folder = Environment.getExternalStorageDirectory();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -114,21 +127,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        } else if (id == android.R.id.home && getSupportFragmentManager().getBackStackEntryCount() > 0) {
+        if (id == android.R.id.home && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStack();
-            return true;
-        } else if (id == R.id.action_dialog) {
-            FileManager.with(this).showHidden(false).setContentType("image/*").
-                    showDialogFileManager(path -> Toast.makeText(MainActivity.this, "onResult: " + path, Toast.LENGTH_SHORT).show());
-            return true;
-        } else if (id == R.id.action_activity) {
-            FileManager.with(this).showHidden(false).setContentType("image/*").
-                    startFileManager(path -> Toast.makeText(MainActivity.this, "onResult: " + path, Toast.LENGTH_SHORT).show());
             return true;
         }
 
@@ -141,22 +141,21 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_WRITE) {
             if (!PermissionUtils.isPermissionGranted(permissions, grantResults,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE) && ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) !=
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE) && ContextCompat.checkSelfPermission(FileManagerActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) !=
                     PackageManager.PERMISSION_GRANTED) {
-                PermissionUtils.requestPermission(MainActivity.this, 0, Manifest.permission.READ_EXTERNAL_STORAGE, true);
+                PermissionUtils.requestPermission(FileManagerActivity.this, 0, Manifest.permission.READ_EXTERNAL_STORAGE, true);
             } else {
                 triggerRebirth(this);
             }
         }
     }
 
-    public static void triggerRebirth(Context context) {
-        Intent intent = new Intent(context, MainActivity.class);
+    public static void triggerRebirth(Activity activity) {
+        Intent intent = new Intent(activity, FileManagerActivity.class);
         intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
-        if (context instanceof Activity) {
-            ((Activity) context).finish();
-        }
+        intent.putExtras(activity.getIntent());
+        activity.startActivity(intent);
+        activity.finish();
 
         Runtime.getRuntime().exit(0);
     }
