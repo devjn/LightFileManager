@@ -21,7 +21,7 @@ import android.os.Environment;
 /**
  * Created by @author Jahongir on 30-Sep-17
  * devjn@jn-arts.com
- * Manager
+ * RequestManager
  */
 public class Manager {
 

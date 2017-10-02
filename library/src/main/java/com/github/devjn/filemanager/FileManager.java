@@ -23,6 +23,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,12 +39,12 @@ final public class FileManager {
     private static volatile List<ResultCallback> callbacks = new ArrayList<>();
     private static volatile Options options = null;
 
-    public static Options with(FragmentActivity activity) {
-        return new Options(new ActivityWrapper(activity));
+    public static Options.RequestManager with(FragmentActivity activity) {
+        return Options.newRequest(new ActivityWrapper(activity));
     }
 
-    public static Options with(Fragment fragment) {
-        return new Options(new FragmentWrapper(fragment));
+    public static Options.RequestManager with(Fragment fragment) {
+        return Options.newRequest(new FragmentWrapper(fragment));
     }
 
     static void deliverResult(String file) {
@@ -84,50 +85,9 @@ final public class FileManager {
         private boolean showHidden = false;
         private ResultCallback callback = null;
 
-        public Options(Wrapper wrapper) {
+        private Options(Wrapper wrapper) {
             this.wrapper = wrapper;
         }
-
-        public Options setContentType(String mimetype) {
-            this.mimeType = mimetype;
-            return this;
-        }
-
-        public Options showHidden(boolean show) {
-            this.showHidden = show;
-            return this;
-        }
-
-        public void startFileManager() {
-            Intent intent = new Intent(wrapper.getContext(), FileManagerActivity.class);
-            intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-            wrapper.startActivity(intent);
-            options = null;
-        }
-
-        public void startFileManager(int requestCode) {
-            options = this;
-            Intent intent = new Intent(wrapper.getContext(), FileManagerActivity.class);
-            intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-            wrapper.startActivityForResult(intent, requestCode);
-        }
-
-        public void startFileManager(ResultCallback callback) {
-            this.callback = callback;
-            options = this;
-            Intent intent = new Intent(wrapper.getContext(), FileManagerActivity.class);
-            intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-            wrapper.startActivity(intent);
-        }
-
-        public void showDialogFileManager(ResultCallback callback) {
-            this.callback = callback;
-            options = this;
-            callbacks.add(callback);
-            DialogFragment fragment = FileManagerDialog.newInstance(mimeType, showHidden);
-            fragment.show(wrapper.getFragmentManager(), "FILE_MANAGER");
-        }
-
 
         ResultCallback getCallback() {
             return callback;
@@ -141,14 +101,84 @@ final public class FileManager {
             return showHidden;
         }
 
-        public static class Manager {
+
+        public static RequestManager newRequest(Wrapper wrapper) {
+            return new Options(wrapper).new RequestManager();
+        }
+
+        public class RequestManager {
+
+            /**
+             * Filter content type the file manager will display.
+             * For example to show only images use "image/*" or choose from {@link Filter}
+             *
+             * @param mimetype if null or empty all files are displayed
+             */
+            public RequestManager setContentType(String mimetype) {
+                Options.this.mimeType = mimetype;
+                return this;
+            }
+
+            /**
+             * Whether file manager should display hidden files (the ones starting with '.')
+             */
+            public RequestManager showHidden(boolean show) {
+                Options.this.showHidden = show;
+                return this;
+            }
+
+            public void startFileManager() {
+                Intent intent = new Intent(wrapper.getContext(), FileManagerActivity.class);
+                intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                wrapper.startActivity(intent);
+                options = null;
+            }
+
+            public void startFileManager(int requestCode) {
+                options = Options.this;
+                Intent intent = new Intent(wrapper.getContext(), FileManagerActivity.class);
+                intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                wrapper.startActivityForResult(intent, requestCode);
+            }
+
+            public void startFileManager(ResultCallback callback) {
+                options = Options.this;
+                Options.this.callback = callback;
+                Intent intent = new Intent(wrapper.getContext(), FileManagerActivity.class);
+                intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                wrapper.startActivity(intent);
+            }
+
+
+            /**
+             * Displays DialogFragment
+             *
+             * @param callback reslut to be delivered to
+             */
+            public void showDialogFileManager(ResultCallback callback) {
+                options = Options.this;
+                callbacks.add(callback);
+                Options.this.callback = callback;
+                DialogFragment fragment = FileManagerDialog.newInstance(mimeType, showHidden);
+                fragment.show(wrapper.getFragmentManager(), "FILE_MANAGER");
+            }
 
         }
 
     }
 
     public interface ResultCallback {
+        /**
+         * @param path path to file returned by {@link File#getAbsolutePath()}
+         */
         void onResult(String path);
+    }
+
+    public interface Filter {
+        String VIDEO = "video/*";
+        String IMAGE = "image/*";
+        String SOUND = "sound/*";
+        String TEXT = "text/*";
     }
 
 
