@@ -81,22 +81,25 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         else holder.picture.setAlpha(1.0f);
         holder.size.setText("");
         if (fileData.isFolder()) {
-            holder.picture.setImageResource(R.drawable.ic_folder);
             if (showCount) holder.size.setText(String.valueOf(fileData.getSize()));
-        } else if (fileData.hasExtension()) {
-            if (MimeTypeUtils.isImage(fileData.getExtension()) || MimeTypeUtils.isVideo(fileData.getExtension()))
-                Glide.with(context).load(fileData.getPath()).into(holder.picture);
-            else setAppropriateIcon(fileData.getExtension(), holder.picture);
-        } else holder.picture.setImageResource(R.drawable.ic_file);
+        }
+        setAppropriateIcon(fileData, fileData.getExtension(), holder.picture);
         holder.itemView.setActivated(selectedItems.get(position, false));
     }
 
-    private void setAppropriateIcon(String ext, ImageView imageView) {
+    private void setAppropriateIcon(FileData fileData, String ext, ImageView imageView) {
         final int drawable;
-        if (MimeTypeUtils.isAudio(ext))
-            drawable = R.drawable.ic_file_audio;
-        else drawable = MapCompat.getOrDefault(MimeTypeUtils.icons, ext, R.drawable.ic_file);
-        
+        if (fileData.isFolder())
+            drawable = R.drawable.ic_folder;
+        else if (fileData.hasExtension()) {
+            if (MimeTypeUtils.isImage(ext) || MimeTypeUtils.isVideo(ext)) {
+                Glide.with(context).load(fileData.getPath()).into(imageView);
+                return;
+            } else if (MimeTypeUtils.isAudio(ext))
+                drawable = R.drawable.ic_file_audio;
+            else drawable = MapCompat.getOrDefault(MimeTypeUtils.icons, ext, R.drawable.ic_file);
+        } else drawable = R.drawable.ic_file;
+
         imageView.setImageResource(drawable);
     }
 
