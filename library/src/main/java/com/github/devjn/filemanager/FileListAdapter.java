@@ -17,6 +17,7 @@
 package com.github.devjn.filemanager;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ import com.github.devjn.filemanager.utils.MimeTypeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by @author Jahongir on 24-Apr-17
@@ -90,28 +92,12 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
     }
 
     private void setAppropriateIcon(String ext, ImageView imageView) {
-        switch (ext) {
-            case "doc":
-            case "docx":
-                imageView.setImageResource(R.drawable.ic_file_doc);
-                break;
-            case "pdf":
-                imageView.setImageResource(R.drawable.ic_file_pdf);
-                break;
-            case "txt":
-                imageView.setImageResource(R.drawable.ic_file_txt);
-                break;
-            case "html":
-                imageView.setImageResource(R.drawable.ic_file_html);
-                break;
-            case "zip":
-                imageView.setImageResource(R.drawable.ic_file_zip);
-                break;
-            default:
-                if (MimeTypeUtils.isAudio(ext))
-                    imageView.setImageResource(R.drawable.ic_file_audio);
-                else imageView.setImageResource(R.drawable.ic_file);
-        }
+        final int drawable;
+        if (MimeTypeUtils.isAudio(ext))
+            drawable = R.drawable.ic_file_audio;
+        else drawable = MapCompat.getOrDefault(MimeTypeUtils.icons, ext, R.drawable.ic_file);
+        
+        imageView.setImageResource(drawable);
     }
 
     @Override
@@ -182,6 +168,16 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         void onClick(int position);
 
         boolean onLongClick(int position);
+    }
+
+    public static class MapCompat {
+
+        public static <K, V> V getOrDefault(@NonNull Map<K, V> map, K key, V defaultValue) {
+            V v;
+            return (((v = map.get(key)) != null) || map.containsKey(key))
+                    ? v
+                    : defaultValue;
+        }
     }
 
 }

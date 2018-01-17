@@ -18,13 +18,13 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion compile_v
+    buildToolsVersion build_v
 
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion compile_v
         versionCode 1
         versionName "1.0"
 
@@ -47,9 +47,6 @@ android {
 
 }
 
-ext {
-    support_v = '26.0.2'
-}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

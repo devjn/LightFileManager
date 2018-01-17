@@ -2,12 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion compile_v
+    buildToolsVersion build_v
+
     defaultConfig {
         applicationId "com.github.devjn.simplefilemanager"
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion compile_v
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -30,10 +31,6 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-}
-
-ext {
-    support_v = '26.0.2'
 }
 
 dependencies {

@@ -382,11 +382,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Dialog_CenterTitle)
                     .setView(mRootView)
                     .setTitle(getString(R.string.action_details))
-                    .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dismiss();
-                        }
-                    });
+                    .setNeutralButton(R.string.ok, (dialog, which) -> dismiss());
             return alertDialog.create();
         }
 

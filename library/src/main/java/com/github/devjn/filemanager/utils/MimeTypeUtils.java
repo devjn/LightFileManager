@@ -18,6 +18,8 @@ package com.github.devjn.filemanager.utils;
 
 import android.support.annotation.NonNull;
 
+import com.github.devjn.filemanager.R;
+
 import java.util.HashMap;
 
 /**
@@ -28,7 +30,9 @@ import java.util.HashMap;
 
 public class MimeTypeUtils {
 
-    private static HashMap<String, String> types = new HashMap<>();
+    private static final HashMap<String, String> types = new HashMap<>();
+
+    public static final HashMap<String, Integer> icons = new HashMap<>();
 
     static {
         init();
@@ -111,6 +115,17 @@ public class MimeTypeUtils {
         types.put("swf", "application/x-shockwave-flash");
 
         types.put("txt", "text/plain");
+
+
+
+        icons.put("doc", R.drawable.ic_file_doc);
+        icons.put("docx", R.drawable.ic_file_doc);
+        icons.put("pdf", R.drawable.ic_file_pdf);
+        icons.put("txt", R.drawable.ic_file_txt);
+        icons.put("html", R.drawable.ic_file_html);
+        icons.put("zip", R.drawable.ic_file_zip);
+        icons.put("audio", R.drawable.ic_file_audio);
+
     }
 
     public static String getType(String filename) {
