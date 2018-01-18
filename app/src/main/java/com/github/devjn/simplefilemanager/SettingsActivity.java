@@ -4,6 +4,7 @@ package com.github.devjn.simplefilemanager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -20,9 +21,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.github.devjn.simplefilemanager.utils.DirectoryPrefernces;
-
-import org.jetbrains.annotations.NotNull;
+import com.github.devjn.filemanager.DataLoader;
+import com.github.devjn.filemanager.FileData;
+import com.github.devjn.filemanager.FileListAdapter;
+import com.github.devjn.simplefilemanager.utils.DirectoryPreferences;
 
 import java.io.File;
 import java.util.List;
@@ -83,7 +85,7 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onDisplayPreferenceDialog(android.support.v7.preference.Preference preference) {
             DialogFragment dialogFragment = null;
-            if (preference instanceof DirectoryPrefernces) {
+            if (preference instanceof DirectoryPreferences) {
                 dialogFragment = DirectoryPreferenceFragment.newInstance(preference.getKey());
             }
 
@@ -131,17 +133,15 @@ public class SettingsActivity extends AppCompatActivity {
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setLayoutManager(mLayoutManager);
 
-            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    if (mPath != null && mPath.length() > 1 && !parentPath.equals(mPath)) {
-                        int index = mPath.lastIndexOf("/");
-                        if (index < 1) return;
-                        mPath = mPath.substring(0, index);
-                        File file = new File(mPath);
-                        if (file.isDirectory())
-                            loadData(file);
-                    } else dismiss();
-                }
+            mToolbar.setNavigationOnClickListener(v -> {
+                if (mPath != null && mPath.length() > 1 && !parentPath.equals(mPath)) {
+                    int index = mPath.lastIndexOf("/");
+                    if (index < 1) return;
+                    mPath = mPath.substring(0, index);
+                    File file = new File(mPath);
+                    if (file.isDirectory())
+                        loadData(file);
+                } else dismiss();
             });
 
 
@@ -154,7 +154,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (!folder.exists() || !folder.isDirectory())
                 folder = Environment.getExternalStorageDirectory();
 
-            DataLoader.INSTANCE.setListener(this);
+            DataLoader.getInstance().setListener(this);
             loadData(folder);
         }
 
@@ -163,8 +163,8 @@ public class SettingsActivity extends AppCompatActivity {
             if (positiveResult) {
                 // Save the value
                 DialogPreference preference = getPreference();
-                if (preference instanceof DirectoryPrefernces) {
-                    DirectoryPrefernces dirPreference = ((DirectoryPrefernces) preference);
+                if (preference instanceof DirectoryPreferences) {
+                    DirectoryPreferences dirPreference = ((DirectoryPreferences) preference);
                     if (dirPreference.callChangeListener(mPath)) {
                         // Save the value
                         dirPreference.setDirectory(mPath);
@@ -174,7 +174,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onDataLoad(@NotNull List<? extends FileData> list) {
+        public void onDataLoad(@NonNull List<FileData> list) {
             this.mData = (List<FileData>) list;
             mAdapter.setData(mData);
         }
@@ -198,7 +198,7 @@ public class SettingsActivity extends AppCompatActivity {
             mPath = folder.getPath();
             mName = folder.getName();
             mToolbar.setTitle(mName);
-            DataLoader.INSTANCE.loadData(folder);
+            DataLoader.getInstance().loadData(folder);
         }
 
     }

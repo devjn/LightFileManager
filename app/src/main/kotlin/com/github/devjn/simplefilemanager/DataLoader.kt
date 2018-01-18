@@ -1,14 +1,5 @@
 package com.github.devjn.simplefilemanager
 
-import android.app.Activity
-import android.util.Log
-import android.widget.Toast
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import java.io.File
-import java.util.*
-
 /**
  * Created by @author Jahongir on 24-Apr-17
  * devjn@jn-arts.com
@@ -17,6 +8,7 @@ import java.util.*
 
 object DataLoader {
 
+  /*
     interface DataListener {
         fun onDataLoad(list: List<FileData>)
     }
@@ -89,5 +81,5 @@ object DataLoader {
             return ++deletedCount
         return deletedCount
     }
-
+*/
 }

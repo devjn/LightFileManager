@@ -18,10 +18,14 @@ package com.github.devjn.filemanager;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+
+import com.github.devjn.filemanager.utils.MimeTypeUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,12 +43,16 @@ final public class FileManager {
     private static volatile List<ResultCallback> callbacks = new ArrayList<>();
     private static volatile Options options = null;
 
-    public static Options.RequestManager with(FragmentActivity activity) {
+    public static Options.RequestManager with(@NonNull FragmentActivity activity) {
         return Options.newRequest(new ActivityWrapper(activity));
     }
 
-    public static Options.RequestManager with(Fragment fragment) {
+    public static Options.RequestManager with(@NonNull Fragment fragment) {
         return Options.newRequest(new FragmentWrapper(fragment));
+    }
+
+    public static void setIconForExtension(@NonNull String extension, @DrawableRes int resIcon) {
+        MimeTypeUtils.addIcon(extension, resIcon);
     }
 
     static void deliverResult(String file) {

@@ -167,7 +167,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         }
     }
 
-    interface FilesClickListener {
+    public interface FilesClickListener {
         void onClick(int position);
 
         boolean onLongClick(int position);

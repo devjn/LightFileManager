@@ -28,7 +28,7 @@
 
 
     <activity
-            android:name=".MainActivity"
+            android:name=".IntroActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -44,7 +44,7 @@
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.devjn.simplefilemanager.MainActivity"/>
+                android:value="com.github.devjn.simplefilemanager.IntroActivity"/>
         </activity>
     </application>
 

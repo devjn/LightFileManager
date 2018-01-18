@@ -17,6 +17,7 @@
 package com.github.devjn.filemanager;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
@@ -39,8 +40,8 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class DataLoader {
 
-    interface DataListener {
-        void onDataLoad(List<FileData> list);
+    public interface DataListener {
+        void onDataLoad(@NonNull List<FileData> list);
     }
 
     private static volatile DataLoader Instance = null;

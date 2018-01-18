@@ -11,10 +11,10 @@ import com.github.devjn.simplefilemanager.R;
 /**
  * Created by @author Jahongir on 24-Apr-17
  * devjn@jn-arts.com
- * DirectoryPrefernces
+ * DirectoryPreferences
  */
 
-public class DirectoryPrefernces extends DialogPreference {
+public class DirectoryPreferences extends DialogPreference {
 
     private String directory;
 
@@ -23,19 +23,19 @@ public class DirectoryPrefernces extends DialogPreference {
      */
     private int mDialogLayoutResId = R.layout.pref_dialog_directory;
 
-    public DirectoryPrefernces(Context context) {
+    public DirectoryPreferences(Context context) {
         this(context, null);
     }
 
-    public DirectoryPrefernces(Context context, AttributeSet attrs) {
+    public DirectoryPreferences(Context context, AttributeSet attrs) {
         this(context, attrs, R.attr.preferenceStyle);
     }
 
-    public DirectoryPrefernces(Context context, AttributeSet attrs, int defStyleAttr) {
+    public DirectoryPreferences(Context context, AttributeSet attrs, int defStyleAttr) {
         this(context, attrs, defStyleAttr, defStyleAttr);
     }
 
-    public DirectoryPrefernces(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public DirectoryPreferences(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
