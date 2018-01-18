@@ -25,7 +25,7 @@ import android.support.v4.app.ShareCompat;
 import android.support.v4.content.FileProvider;
 import android.webkit.MimeTypeMap;
 
-import com.github.devjn.filemanager.Manager;
+import com.github.devjn.filemanager.Config;
 import com.github.devjn.filemanager.FileData;
 import com.github.devjn.filemanager.R;
 
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
-import static com.github.devjn.filemanager.Manager.FILES_AUTHORITY;
+import static com.github.devjn.filemanager.Config.FILES_AUTHORITY;
 
 /**
  * Created by @author Jahongir on 25-Apr-17
@@ -56,7 +56,7 @@ public class IntentUtils {
         newIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         String mimeType = myMime.getMimeTypeFromExtension(Utils.fileExt(fileData.getPath().substring(1)));
         Uri openUri = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) ?
-                FileProvider.getUriForFile(context, Manager.FILES_AUTHORITY, folder) :
+                FileProvider.getUriForFile(context, Config.FILES_AUTHORITY, folder) :
                 Uri.fromFile(folder);
         newIntent.setDataAndType(openUri, mimeType);
         newIntent.addFlags(FLAG_GRANT_READ_URI_PERMISSION);

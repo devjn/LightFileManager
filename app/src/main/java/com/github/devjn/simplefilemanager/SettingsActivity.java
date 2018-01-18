@@ -106,8 +106,7 @@ public class SettingsActivity extends AppCompatActivity {
             implements DataLoader.DataListener, FileListAdapter.FilesClickListener {
 
         public static DirectoryPreferenceFragment newInstance(String key) {
-            final DirectoryPreferenceFragment
-                    fragment = new DirectoryPreferenceFragment();
+            final DirectoryPreferenceFragment fragment = new DirectoryPreferenceFragment();
             final Bundle b = new Bundle(1);
             b.putString(ARG_KEY, key);
             fragment.setArguments(b);

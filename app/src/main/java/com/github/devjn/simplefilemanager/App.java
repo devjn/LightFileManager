@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
+import com.github.devjn.filemanager.FileManager;
+
 /**
  * Created by @author Jahongir on 24-Apr-17
  * devjn@jn-arts.com
@@ -28,6 +30,8 @@ public class App extends Application {
         super.onCreate();
         applicationContext = getApplicationContext();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        FileManager.getConfig().setDefaultFolder(App.getDefaultFolder()).setShowFolderCount(App.getShowFolderCount());
     }
 
     public static void setDefaultFolder(String folder) {

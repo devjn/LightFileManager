@@ -171,9 +171,9 @@ public class DataLoader {
                         File file = new File(data.get(i).getPath());
                         deletedCount.addAndGet(deleteRecursive(file));
                     } catch (Exception e) {
-                        Log.e(Manager.TAG, "Failed to delete file" + e);
+                        Log.e(Config.TAG, "Failed to delete file" + e);
                     }
-                }, e -> Log.e(Manager.TAG, "Failed to delete file" + e), () ->
+                }, e -> Log.e(Config.TAG, "Failed to delete file" + e), () ->
                         activity.runOnUiThread(() -> {
                             Toast.makeText(activity, deletedCount.get() + "files deleted", Toast.LENGTH_SHORT).show();
                             loadData(new File(path));

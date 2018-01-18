@@ -21,31 +21,38 @@ import android.os.Environment;
 /**
  * Created by @author Jahongir on 30-Sep-17
  * devjn@jn-arts.com
- * RequestManager
+ * Config
  */
-public class Manager {
+@SuppressWarnings("UnusedReturnValue")
+public class Config {
 
     public static final String TAG = "FileManager";
 
     public static String FILES_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileprovider";
 
-    private static String DEF_FOLDER;
+    private String defaultFolder;
+    private boolean showFolderCount;
 
-    static {
-        DEF_FOLDER = Environment.getExternalStorageDirectory().getAbsolutePath();
+    public Config() {
+        defaultFolder = Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
-
-    public static void setDefaultFolder(String folder) {
-        DEF_FOLDER = folder;
+    public Config setDefaultFolder(String folder) {
+        defaultFolder = folder;
+        return this;
     }
 
-    public static String getDefaultFolder() {
-        return DEF_FOLDER;
+    public Config setShowFolderCount(boolean show) {
+        this.showFolderCount = show;
+        return this;
     }
 
-    public static boolean getShowFolderCount() {
-        return false;
+    public String getDefaultFolder() {
+        return defaultFolder;
+    }
+
+    public boolean getShowFolderCount() {
+        return showFolderCount;
     }
 
 

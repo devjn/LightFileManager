@@ -29,9 +29,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
@@ -133,7 +131,7 @@ public class FileManagerDialog extends DialogFragment implements DataLoader.Data
         mRecyclerView.setAdapter(mAdapter);
 
         parentPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File folder = new File(Manager.getDefaultFolder());
+        File folder = new File(FileManager.getConfig().getDefaultFolder());
         if (!folder.exists() || !folder.isDirectory())
             folder = Environment.getExternalStorageDirectory();
 

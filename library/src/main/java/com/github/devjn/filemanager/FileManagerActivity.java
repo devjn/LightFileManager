@@ -74,7 +74,7 @@ public class FileManagerActivity extends AppCompatActivity implements FragmentMa
     }
 
     private void addFragments() {
-        File folder = new File(Manager.getDefaultFolder());
+        File folder = new File(FileManager.getConfig().getDefaultFolder());
         if (!folder.exists() || !folder.isDirectory())
             folder = Environment.getExternalStorageDirectory();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

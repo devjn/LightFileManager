@@ -41,6 +41,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 final public class FileManager {
 
     private static volatile List<ResultCallback> callbacks = new ArrayList<>();
+    private static volatile Config config = new Config();
     private static volatile Options options = null;
 
     public static Options.RequestManager with(@NonNull FragmentActivity activity) {
@@ -53,6 +54,15 @@ final public class FileManager {
 
     public static void setIconForExtension(@NonNull String extension, @DrawableRes int resIcon) {
         MimeTypeUtils.addIcon(extension, resIcon);
+    }
+
+    public static void setConfig(@NonNull Config conf) {
+        FileManager.config = conf;
+    }
+
+    @NonNull
+    public static Config getConfig() {
+        return FileManager.config;
     }
 
     static void deliverResult(String file) {

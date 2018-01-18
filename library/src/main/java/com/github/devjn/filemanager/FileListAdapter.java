@@ -55,7 +55,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         this.isPortrait = isPortrait;
         this.clickListener = clickListener;
         selectedItems = new SparseBooleanArray();
-        showCount = Manager.getShowFolderCount();
+        showCount = FileManager.getConfig().getShowFolderCount();
     }
 
     @Override
