@@ -17,6 +17,9 @@
 package com.github.devjn.filemanager;
 
 import android.os.Environment;
+import android.widget.ImageView;
+
+import com.github.devjn.filemanager.utils.Utils;
 
 /**
  * Created by @author Jahongir on 30-Sep-17
@@ -28,13 +31,31 @@ public class Config {
 
     public static final String TAG = "FileManager";
 
-    public static String FILES_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileprovider";
+    public interface ImageManager {
+        void load(ImageView imageView, FileData fileData);
+
+        void clear(ImageView imageView);
+    }
+
+    public interface ImageLoader extends ImageManager {
+        @Override
+        default void clear(ImageView imageView) {
+        }
+    }
 
     private String defaultFolder;
     private boolean showFolderCount;
+    private ImageManager imageLoader;
 
     public Config() {
         defaultFolder = Environment.getExternalStorageDirectory().getAbsolutePath();
+        imageLoader = (ImageLoader) (imageView, fileData) -> {
+            try {
+                imageView.setImageBitmap(Utils.decodeSampledBitmap(fileData.getPath(), imageView.getWidth(), imageView.getHeight()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
     }
 
     public Config setDefaultFolder(String folder) {
@@ -47,13 +68,22 @@ public class Config {
         return this;
     }
 
+    public Config setCustomImageLoader(ImageLoader loader) {
+        this.imageLoader = loader;
+        return this;
+    }
+
+
     public String getDefaultFolder() {
         return defaultFolder;
     }
 
-    public boolean getShowFolderCount() {
+    public boolean isShowFolderCount() {
         return showFolderCount;
     }
 
+    public ImageManager getImageLoader() {
+        return imageLoader;
+    }
 
 }

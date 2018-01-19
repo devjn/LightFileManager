@@ -25,16 +25,17 @@ import android.support.v4.app.ShareCompat;
 import android.support.v4.content.FileProvider;
 import android.webkit.MimeTypeMap;
 
-import com.github.devjn.filemanager.Config;
 import com.github.devjn.filemanager.FileData;
+import com.github.devjn.filemanager.FileManagerFileProvider;
 import com.github.devjn.filemanager.R;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.annotations.NonNull;
+
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
-import static com.github.devjn.filemanager.Config.FILES_AUTHORITY;
 
 /**
  * Created by @author Jahongir on 25-Apr-17
@@ -49,15 +50,16 @@ public class IntentUtils {
      * @param fileData file to open
      * @return true if handler found, false otherwise
      */
-    public static boolean openFile(Context context, FileData fileData) {
-        File folder = new File(fileData.getPath());
+    public static boolean openFile(@NonNull Context context, @NonNull FileData fileData) {
+        File file = new File(fileData.getPath());
         MimeTypeMap myMime = MimeTypeMap.getSingleton();
         Intent newIntent = new Intent(Intent.ACTION_VIEW);
         newIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         String mimeType = myMime.getMimeTypeFromExtension(Utils.fileExt(fileData.getPath().substring(1)));
+
         Uri openUri = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) ?
-                FileProvider.getUriForFile(context, Config.FILES_AUTHORITY, folder) :
-                Uri.fromFile(folder);
+                FileProvider.getUriForFile(context, FileManagerFileProvider.getAuthority(), file) :
+                Uri.fromFile(file);
         newIntent.setDataAndType(openUri, mimeType);
         newIntent.addFlags(FLAG_GRANT_READ_URI_PERMISSION);
         if (newIntent.resolveActivity(context.getPackageManager()) != null) {
@@ -70,7 +72,7 @@ public class IntentUtils {
     public static void shareFile(Activity activity, FileData fileData) {
         File file = new File(fileData.getPath());
         Uri uriToShare = FileProvider.getUriForFile(
-                activity, FILES_AUTHORITY, file);
+                activity, FileManagerFileProvider.getAuthority(), file);
         MimeTypeMap myMime = MimeTypeMap.getSingleton();
         String mimeType = myMime.getMimeTypeFromExtension(Utils.fileExt(fileData.getPath().substring(1)));
         Intent shareIntent = ShareCompat.IntentBuilder.from(activity)
@@ -91,8 +93,7 @@ public class IntentUtils {
         for (FileData data : datas) {
             if (data.isFolder()) continue;
             File file = new File(data.getPath());
-            Uri uri = FileProvider.getUriForFile(
-                    activity, FILES_AUTHORITY, file);
+            Uri uri = FileProvider.getUriForFile(activity, FileManagerFileProvider.getAuthority(), file);
             files.add(uri);
         }
         Intent shareIntent = ShareCompat.IntentBuilder.from(activity)

@@ -17,7 +17,6 @@
 package com.github.devjn.filemanager;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -26,12 +25,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.github.devjn.filemanager.utils.MimeTypeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by @author Jahongir on 24-Apr-17
@@ -55,7 +52,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         this.isPortrait = isPortrait;
         this.clickListener = clickListener;
         selectedItems = new SparseBooleanArray();
-        showCount = FileManager.getConfig().getShowFolderCount();
+        showCount = FileManager.getConfig().isShowFolderCount();
     }
 
     @Override
@@ -67,7 +64,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
     @Override
     public void onViewRecycled(RecyclerViewHolders holder) {
         super.onViewRecycled(holder);
-        Glide.clear(holder.picture);
+        FileManager.getConfig().getImageLoader().clear(holder.picture);
     }
 
     @Override
@@ -83,25 +80,10 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         if (fileData.isFolder()) {
             if (showCount) holder.size.setText(String.valueOf(fileData.getSize()));
         }
-        setAppropriateIcon(fileData, fileData.getExtension(), holder.picture);
+        MimeTypeUtils.setIconForFile(holder.picture, fileData);
         holder.itemView.setActivated(selectedItems.get(position, false));
     }
 
-    private void setAppropriateIcon(FileData fileData, String ext, ImageView imageView) {
-        final int drawable;
-        if (fileData.isFolder())
-            drawable = R.drawable.ic_folder;
-        else if (fileData.hasExtension()) {
-            if (MimeTypeUtils.isImage(ext) || MimeTypeUtils.isVideo(ext)) {
-                Glide.with(context).load(fileData.getPath()).into(imageView);
-                return;
-            } else if (MimeTypeUtils.isAudio(ext))
-                drawable = R.drawable.ic_file_audio;
-            else drawable = MapCompat.getOrDefault(MimeTypeUtils.icons, ext, R.drawable.ic_file);
-        } else drawable = R.drawable.ic_file;
-
-        imageView.setImageResource(drawable);
-    }
 
     @Override
     public int getItemCount() {
@@ -147,7 +129,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         TextView size;
         ImageView picture;
 
-        public RecyclerViewHolders(View itemView) {
+        RecyclerViewHolders(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
@@ -171,16 +153,6 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         void onClick(int position);
 
         boolean onLongClick(int position);
-    }
-
-    public static class MapCompat {
-
-        public static <K, V> V getOrDefault(@NonNull Map<K, V> map, K key, V defaultValue) {
-            V v;
-            return (((v = map.get(key)) != null) || map.containsKey(key))
-                    ? v
-                    : defaultValue;
-        }
     }
 
 }

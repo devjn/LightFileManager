@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2017 devjn
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,19 +15,25 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.github.devjn.filemanager">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <!--Android O (26<) permission to allow apps install-->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <application>
         <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
+            android:name=".FileManagerFileProvider"
+            android:authorities="${applicationId}.filemanager.fileprovider"
             android:exported="false"
-            android:grantUriPermissions="true">
+            android:grantUriPermissions="true"
+            tools:replace="android:authorities">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/filepaths" />
+                android:resource="@xml/filepaths"
+                tools:replace="android:resource" />
         </provider>
 
         <activity

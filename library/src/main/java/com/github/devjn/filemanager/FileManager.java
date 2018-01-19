@@ -38,11 +38,25 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  * devjn@jn-arts.com
  * FileManager
  */
+@SuppressWarnings("ALL")
 final public class FileManager {
 
     private static volatile List<ResultCallback> callbacks = new ArrayList<>();
     private static volatile Config config = new Config();
     private static volatile Options options = null;
+
+
+    public static Config init(Context context) {
+        FileManagerFileProvider.updateAuthority(context.getApplicationContext().getPackageName());
+        return config;
+    }
+
+    public static Config init(Context context, Config config) {
+        FileManager.config = config;
+        context.getApplicationContext().getPackageName();
+        return config;
+    }
+
 
     public static Options.RequestManager with(@NonNull FragmentActivity activity) {
         return Options.newRequest(new ActivityWrapper(activity));
@@ -56,14 +70,11 @@ final public class FileManager {
         MimeTypeUtils.addIcon(extension, resIcon);
     }
 
-    public static void setConfig(@NonNull Config conf) {
-        FileManager.config = conf;
-    }
-
     @NonNull
     public static Config getConfig() {
         return FileManager.config;
     }
+
 
     static void deliverResult(String file) {
         for (ResultCallback callback : callbacks) {

@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
+import com.bumptech.glide.Glide;
 import com.github.devjn.filemanager.FileManager;
 
 /**
@@ -19,7 +20,7 @@ public class App extends Application {
     public static final String TAG = "SimpleFileManager";
     public static volatile Context applicationContext = null;
 
-    public static String FILES_AUTHORITY = BuildConfig.APPLICATION_ID+".fileprovider";
+    public static String FILES_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileprovider";
 
     private static SharedPreferences prefs;
 
@@ -31,7 +32,10 @@ public class App extends Application {
         applicationContext = getApplicationContext();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        FileManager.getConfig().setDefaultFolder(App.getDefaultFolder()).setShowFolderCount(App.getShowFolderCount());
+        FileManager.init(applicationContext).setDefaultFolder(App.getDefaultFolder()).setShowFolderCount(App.getShowFolderCount())
+                .setCustomImageLoader((imageView, fileData) -> Glide.with(imageView.getContext()).load(fileData.getPath()).into(imageView));
+
+        FileManager.setIconForExtension("apk", R.drawable.ic_apk);
     }
 
     public static void setDefaultFolder(String folder) {

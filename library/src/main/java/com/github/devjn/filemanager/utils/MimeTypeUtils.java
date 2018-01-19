@@ -18,7 +18,10 @@ package com.github.devjn.filemanager.utils;
 
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.widget.ImageView;
 
+import com.github.devjn.filemanager.FileData;
+import com.github.devjn.filemanager.FileManager;
 import com.github.devjn.filemanager.R;
 
 import java.util.HashMap;
@@ -32,8 +35,7 @@ import java.util.HashMap;
 public class MimeTypeUtils {
 
     private static final HashMap<String, String> types = new HashMap<>();
-
-    public static final HashMap<String, Integer> icons = new HashMap<>();
+    private static final HashMap<String, Integer> icons = new HashMap<>();
 
     static {
         init();
@@ -155,7 +157,26 @@ public class MimeTypeUtils {
         return getType(Utils.fileExt(filename)).startsWith("video");
     }
 
+
     public static void addIcon(@NonNull String extension, @DrawableRes int resIcon) {
         icons.put(extension, resIcon);
     }
+
+    public static void setIconForFile(ImageView imageView, FileData fileData) {
+        String ext = fileData.getExtension();
+        final int drawable;
+        if (fileData.isFolder())
+            drawable = R.drawable.ic_folder;
+        else if (fileData.hasExtension()) {
+            if (MimeTypeUtils.isImage(ext) || MimeTypeUtils.isVideo(ext)) {
+                FileManager.getConfig().getImageLoader().load(imageView, fileData);
+                return;
+            } else if (MimeTypeUtils.isAudio(ext))
+                drawable = R.drawable.ic_file_audio;
+            else drawable = MapCompat.getOrDefault(MimeTypeUtils.icons, ext, R.drawable.ic_file);
+        } else drawable = R.drawable.ic_file;
+
+        imageView.setImageResource(drawable);
+    }
+
 }
