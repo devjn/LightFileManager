@@ -68,12 +68,12 @@ public class SettingsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
-            super.onBackPressed();
-        else NavUtils.navigateUpFromSameTask(this);
-    }
+//    @Override
+//    public void onBackPressed() {
+//        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+//            super.onBackPressed();
+//        else NavUtils.navigateUpFromSameTask(this);
+//    }
 
     public static class GeneralPreferenceFragment extends PreferenceFragmentCompat {
 
@@ -144,7 +144,7 @@ public class SettingsActivity extends AppCompatActivity {
             });
 
 
-            mAdapter = new FileListAdapter(getContext(), this, mData,
+            mAdapter = new FileListAdapter(null, this, mData,
                     getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
             mRecyclerView.setAdapter(mAdapter);
 

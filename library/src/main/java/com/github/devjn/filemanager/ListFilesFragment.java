@@ -18,7 +18,6 @@ package com.github.devjn.filemanager;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -60,12 +59,13 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     private static String NAME_KEY = "NAME";
     private static String FOLDER_KEY = "FOLDER";
 
-    public static ListFilesFragment newInstance(String name, String folderPath, boolean load) {
+    public static ListFilesFragment newInstance(String name, String folderPath, boolean load, int requestId) {
         ListFilesFragment fragment = new ListFilesFragment();
         Bundle args = new Bundle();
         args.putBoolean(LOAD, load);
         args.putString(NAME_KEY, name);
         args.putString(FOLDER_KEY, folderPath);
+        args.putInt(Config.EXTRA_ID, requestId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -80,6 +80,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
 
     private ActionMode actionMode;
     private List<Integer> mSelectedActionItems;
+    private FileManager.RequestHolder requestHolder;
 
     private List<? extends FileData> mData;
     private String mName;
@@ -92,8 +93,9 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
         setHasOptionsMenu(true);
         Bundle args = getArguments();
         DataLoader.getInstance().setListener(this);
-        mSelectedActionItems = new ArrayList<Integer>();
+        mSelectedActionItems = new ArrayList<>();
         if (args != null && args.containsKey(FOLDER_KEY)) {
+            this.requestHolder = FileManager.getRequestHolder(args.getInt(Config.EXTRA_ID));
             mPath = args.getString(FOLDER_KEY);
             mName = args.getString(NAME_KEY, "");
             if (!args.getBoolean(LOAD)) return;
@@ -103,7 +105,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         mRecyclerView = mRootView.findViewById(R.id.list);
@@ -124,7 +126,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
                 ab.setDisplayHomeAsUpEnabled(true);
         }
 
-        mAdapter = new FileListAdapter(getContext(), this, mData,
+        mAdapter = new FileListAdapter(requestHolder, this, mData,
                 getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
         mRecyclerView.setAdapter(mAdapter);
 
@@ -156,7 +158,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     }
 
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putIntegerArrayList("SelectedActionItems", (ArrayList<Integer>) mSelectedActionItems);
     }
@@ -214,18 +216,20 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
 
         FileData fileData = mData.get(position);
         if (fileData.isFolder()) {
-            Fragment fragment = ListFilesFragment.newInstance(fileData.getName(), fileData.getPath(), true);
+            Fragment fragment = ListFilesFragment.newInstance(fileData.getName(), fileData.getPath(), true, requestHolder.getId());
             FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
             transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             transaction.replace(R.id.container, fragment, "child")
                     .addToBackStack(null)
                     .commit();
         } else {
-            if (FileManager.getOptions() != null) {
-                if (FileManager.getOptions().getCallback() != null) {
-                    FileManager.getOptions().getCallback().onResult(fileData.getPath());
+            if (requestHolder != null) {
+                if (requestHolder.callback != null) {
+                    FileManager.deliverResult(requestHolder.options.getId(), fileData.getPath());
                     getActivity().finish();
-                } else if (getActivity().getCallingActivity() != null) {
+                }
+                //TODO: There is a bug, which results in non null calling activity after coming back from another activity
+                else if (getActivity().getCallingActivity() != null) {
                     Intent data = new Intent();
                     data.setData(Uri.parse(fileData.getPath()));
                     getActivity().setResult(Activity.RESULT_OK, data);
@@ -347,11 +351,24 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     }
 
     private void loadData() {
-        FileManager.Options options = FileManager.getOptions();
+        FileManager.Options options = getOptions();
         if (options != null)
             DataLoader.getInstance().loadData(new File(mPath), options.getMimeType(), options.isShowHidden());
         else
             DataLoader.getInstance().loadData(new File(mPath));
+    }
+
+
+    protected final FileManager.Options getOptions() {
+        if (requestHolder == null) {
+            return FileManager.getInstance().getOptions();
+        } else return requestHolder.options;
+    }
+
+    protected final Config getConfig() {
+        if (requestHolder == null || requestHolder.options.getConfig() == null) {
+            return FileManager.getInstance().getConfig();
+        } else return requestHolder.options.getConfig();
     }
 
 

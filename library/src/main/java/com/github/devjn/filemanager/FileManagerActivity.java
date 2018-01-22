@@ -47,6 +47,8 @@ public class FileManagerActivity extends AppCompatActivity implements FragmentMa
 
     private static int REQUEST_WRITE = 100;
 
+    FileManager.RequestHolder requestHolder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +57,8 @@ public class FileManagerActivity extends AppCompatActivity implements FragmentMa
         setSupportActionBar(toolbar);
 
         checkPermissions();
+
+        requestHolder = FileManager.getRequestHolder(getIntent().getIntExtra(Config.EXTRA_ID, -1));
 
         if (savedInstanceState == null && PermissionUtils.isWriteGranted(this)) {
             addFragments();
@@ -74,7 +78,7 @@ public class FileManagerActivity extends AppCompatActivity implements FragmentMa
     }
 
     private void addFragments() {
-        File folder = new File(FileManager.getConfig().getDefaultFolder());
+        File folder = new File(getConfig().getDefaultFolder());
         if (!folder.exists() || !folder.isDirectory())
             folder = Environment.getExternalStorageDirectory();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -82,7 +86,7 @@ public class FileManagerActivity extends AppCompatActivity implements FragmentMa
         if (!folder.equals(Environment.getExternalStorageDirectory())) {
             final String parentPath = Environment.getExternalStorageDirectory().getAbsolutePath();
             String path = folder.getAbsolutePath();
-            Fragment fragment = ListFilesFragment.newInstance(Environment.getExternalStorageDirectory().getName(), parentPath, false);
+            Fragment fragment = ListFilesFragment.newInstance(Environment.getExternalStorageDirectory().getName(), parentPath, false, requestHolder.getId());
             transaction.add(R.id.container, fragment, "parent").commit();
             ArrayList<File> list = new ArrayList<>();
             while (path.length() > 1 && !parentPath.equals(path)) {
@@ -93,18 +97,18 @@ public class FileManagerActivity extends AppCompatActivity implements FragmentMa
             }
             Collections.reverse(list);
             for (File child : list) {
-                fragment = ListFilesFragment.newInstance(child.getName(), child.getAbsolutePath(), false);
+                fragment = ListFilesFragment.newInstance(child.getName(), child.getAbsolutePath(), false, requestHolder.getId());
                 transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.container, fragment, "child")
                         .addToBackStack(null)
                         .commit();
             }
-            fragment = ListFilesFragment.newInstance(folder.getName(), folder.getAbsolutePath(), true);
+            fragment = ListFilesFragment.newInstance(folder.getName(), folder.getAbsolutePath(), true, requestHolder.getId());
             transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.container, fragment, "main")
                     .addToBackStack(null).commit();
         } else {
-            Fragment fragment = ListFilesFragment.newInstance(folder.getName(), folder.getPath(), true);
+            Fragment fragment = ListFilesFragment.newInstance(folder.getName(), folder.getPath(), true, requestHolder.getId());
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, fragment, "main")
                     .commit();
@@ -168,4 +172,18 @@ public class FileManagerActivity extends AppCompatActivity implements FragmentMa
             actionBar.setDisplayHomeAsUpEnabled(true);
         else actionBar.setDisplayHomeAsUpEnabled(false);
     }
+
+
+    protected final FileManager.Options getOptions() {
+        if (requestHolder == null) {
+            return FileManager.getInstance().getOptions();
+        } else return requestHolder.options;
+    }
+
+    protected final Config getConfig() {
+        if (requestHolder == null || requestHolder.options.getConfig() == null) {
+            return FileManager.getInstance().getConfig();
+        } else return requestHolder.options.getConfig();
+    }
+
 }

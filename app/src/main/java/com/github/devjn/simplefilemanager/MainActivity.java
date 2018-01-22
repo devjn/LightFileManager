@@ -13,7 +13,7 @@ public class MainActivity extends FileManagerActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        FileManager.getConfig().setDefaultFolder(App.getDefaultFolder()).setShowFolderCount(App.getShowFolderCount());
+        App.updateFileManagerPrefs();
         super.onCreate(savedInstanceState);
     }
 
@@ -49,8 +49,14 @@ public class MainActivity extends FileManagerActivity {
     }
 
     @Override
+    protected void onStart() {
+        App.updateFileManagerPrefs();
+        super.onStart();
+    }
+
+    @Override
     protected void onResume() {
-        FileManager.getConfig().setDefaultFolder(App.getDefaultFolder()).setShowFolderCount(App.getShowFolderCount());
+        App.updateFileManagerPrefs();
         super.onResume();
     }
 }

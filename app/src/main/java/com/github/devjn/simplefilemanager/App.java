@@ -26,13 +26,16 @@ public class App extends Application {
 
     private static String DEF_FOLDER = "DEF_FOLDER";
 
+
     @Override
     public void onCreate() {
         super.onCreate();
         applicationContext = getApplicationContext();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        FileManager.init(applicationContext).setDefaultFolder(App.getDefaultFolder()).setShowFolderCount(App.getShowFolderCount())
+        FileManager.initialize(applicationContext);
+        FileManager.getInstance().getConfig().setDefaultFolder(App.getDefaultFolder())
+                .setShowFolderCount(App.getShowFolderCount()).showHidden(App.getShowHidden())
                 .setCustomImageLoader((imageView, fileData) -> Glide.with(imageView.getContext()).load(fileData.getPath()).into(imageView));
 
         FileManager.setIconForExtension("apk", R.drawable.ic_apk);
@@ -48,6 +51,15 @@ public class App extends Application {
 
     public static boolean getShowFolderCount() {
         return prefs.getBoolean(applicationContext.getString(R.string.pref_folder_count), true);
+    }
+
+    public static boolean getShowHidden() {
+        return prefs.getBoolean(applicationContext.getString(R.string.pref_hidden_shown), false);
+    }
+
+    public static void updateFileManagerPrefs() {
+        FileManager.getInstance().getConfig().setDefaultFolder(App.getDefaultFolder())
+                .setShowFolderCount(App.getShowFolderCount()).showHidden(App.getShowHidden());
     }
 
 }

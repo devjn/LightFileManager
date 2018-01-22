@@ -16,7 +16,7 @@
 
 package com.github.devjn.filemanager;
 
-import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -38,7 +38,7 @@ import java.util.List;
 
 public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.RecyclerViewHolders> {
 
-    private Context context;
+    private FileManager.RequestHolder requestHolder;
     private boolean isPortrait;
     private List<? extends FileData> itemList;
     private FilesClickListener clickListener;
@@ -46,13 +46,13 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
 
     private boolean showCount;
 
-    public FileListAdapter(Context context, FilesClickListener clickListener, List<? extends FileData> itemList, boolean isPortrait) {
-        this.context = context;
+    public FileListAdapter(@Nullable FileManager.RequestHolder requestHolder, FilesClickListener clickListener, List<? extends FileData> itemList, boolean isPortrait) {
         this.itemList = itemList;
         this.isPortrait = isPortrait;
         this.clickListener = clickListener;
-        selectedItems = new SparseBooleanArray();
-        showCount = FileManager.getConfig().isShowFolderCount();
+        this.requestHolder = requestHolder;
+        this.selectedItems = new SparseBooleanArray();
+        showCount = FileManager.getInstance().getConfig().isShowFolderCount();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
     @Override
     public void onViewRecycled(RecyclerViewHolders holder) {
         super.onViewRecycled(holder);
-        FileManager.getConfig().getImageLoader().clear(holder.picture);
+        FileManager.getInstance().getConfig().getImageLoader().clear(holder.picture);
     }
 
     @Override

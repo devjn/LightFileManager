@@ -169,7 +169,7 @@ public class MimeTypeUtils {
             drawable = R.drawable.ic_folder;
         else if (fileData.hasExtension()) {
             if (MimeTypeUtils.isImage(ext) || MimeTypeUtils.isVideo(ext)) {
-                FileManager.getConfig().getImageLoader().load(imageView, fileData);
+                FileManager.getInstance().getConfig().getImageLoader().load(imageView, fileData);
                 return;
             } else if (MimeTypeUtils.isAudio(ext))
                 drawable = R.drawable.ic_file_audio;

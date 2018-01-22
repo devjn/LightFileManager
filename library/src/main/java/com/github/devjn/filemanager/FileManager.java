@@ -20,16 +20,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
+import android.util.SparseArray;
 
 import com.github.devjn.filemanager.utils.MimeTypeUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
@@ -39,23 +41,45 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  * FileManager
  */
 @SuppressWarnings("ALL")
-final public class FileManager {
+public final class FileManager {
 
-    private static volatile List<ResultCallback> callbacks = new ArrayList<>();
-    private static volatile Config config = new Config();
-    private static volatile Options options = null;
+    private static final String TAG = FileManager.class.getSimpleName();
+    private static volatile FileManager Instance = null;
 
+    public static FileManager getInstance() {
+        FileManager localInstance = Instance;
+        if (localInstance == null) {
+            Log.w(TAG, "localInstance is null");
+            synchronized (FileManager.class) {
+                localInstance = Instance;
+                if (localInstance == null) {
+                    Instance = localInstance = new FileManager();
+                }
+            }
+        }
+        return localInstance;
+    }
 
-    public static Config init(Context context) {
+    private final SparseArray<RequestHolder> entities;
+    private final GlobalConfig globalConfig;
+    private final RequestHolder globalRequest;
+    private final AtomicInteger ids;
+
+    private FileManager() {
+        this.entities = new SparseArray<>();
+        this.globalConfig = new GlobalConfig();
+        this.globalRequest = new RequestHolder(globalConfig.getOptions(), null);
+        this.ids = new AtomicInteger();
+    }
+
+    public static void initialize(Context context) {
         FileManagerFileProvider.updateAuthority(context.getApplicationContext().getPackageName());
-        return config;
     }
 
-    public static Config init(Context context, Config config) {
-        FileManager.config = config;
-        context.getApplicationContext().getPackageName();
-        return config;
-    }
+//    public static void initialize(Context context, Config config) {
+//        FileManager.globalConfig = config;
+//        context.getApplicationContext().getPackageName();
+//    }
 
 
     public static Options.RequestManager with(@NonNull FragmentActivity activity) {
@@ -71,55 +95,100 @@ final public class FileManager {
     }
 
     @NonNull
-    public static Config getConfig() {
-        return FileManager.config;
+    public GlobalConfig getConfig() {
+        return this.globalConfig;
+    }
+
+    @NonNull
+    public Options getOptions() {
+        return this.globalConfig.getOptions();
     }
 
 
-    static void deliverResult(String file) {
-        for (ResultCallback callback : callbacks) {
-            callback.onResult(file);
+    static void deliverResult(int resultId, String file) {
+        RequestHolder holder = FileManager.getInstance().entities.get(resultId);
+        if (holder != null) {
+            holder.callback.onResult(file);
+        } else
+            Log.wtf(TAG, "No ResultCallback for id : " + resultId + " , file \"" + file + "\" not delivered");
+        FileManager.getInstance().entities.delete(resultId);
+    }
+
+    static RequestHolder getRequestHolder(int id) {
+        if (id == -1) return FileManager.getInstance().globalRequest;
+        return FileManager.getInstance().entities.get(id);
+    }
+
+
+    public static class GlobalConfig extends Config {
+
+        final FileManager.Options options;
+
+        private GlobalConfig() {
+            this.options = new FileManager.Options(this);
         }
-        callbacks.clear();
-        options = null;
-    }
 
-    static Options getOptions() {
-        Options localInstance = options;
-        if (localInstance == null) {
-            synchronized (FileManager.class) {
-                localInstance = options;
-            }
+        public FileManager.Options getOptions() {
+            return options;
         }
-        return localInstance;
+
+        /**
+         * Whether file manager will display hidden files (the ones starting with '.')
+         */
+        public boolean isShowHidden() {
+            return options.isShowHidden();
+        }
+
+        /**
+         * Whether file manager should display hidden files (the ones starting with '.')
+         */
+        public GlobalConfig showHidden(boolean show) {
+            this.options.showHidden = show;
+            return this;
+        }
+
+        @Override
+        public GlobalConfig setCustomImageLoader(ImageLoader loader) {
+            return (GlobalConfig) super.setCustomImageLoader(loader);
+        }
+
+        @Override
+        public GlobalConfig setDefaultFolder(String folder) {
+            return (GlobalConfig) super.setDefaultFolder(folder);
+        }
+
+        @Override
+        public GlobalConfig setShowFolderCount(boolean show) {
+            return (GlobalConfig) super.setShowFolderCount(show);
+        }
+
     }
 
-    interface Wrapper {
-
-        void startActivity(Intent intent);
-
-        void startActivityForResult(Intent intent, int requestCode);
-
-        FragmentManager getFragmentManager();
-
-        Context getContext();
-
-    }
 
     public final static class Options {
 
-        private final Wrapper wrapper;
+        private transient final Wrapper wrapper;
+        private final Config config;
+        private final int id;
 
         private String mimeType = null;
         private boolean showHidden = false;
-        private ResultCallback callback = null;
 
         private Options(Wrapper wrapper) {
+            this.config = new Config(FileManager.getInstance().getConfig());
+            this.id = FileManager.getInstance().ids.getAndIncrement();
             this.wrapper = wrapper;
         }
 
-        ResultCallback getCallback() {
-            return callback;
+        Options(Config config) {
+            this.config = config;
+            this.wrapper = null;
+            this.id = -1;
+        }
+
+
+        public int getId() {
+            return id;
         }
 
         String getMimeType() {
@@ -130,12 +199,16 @@ final public class FileManager {
             return showHidden;
         }
 
+        Config getConfig() {
+            return config;
+        }
 
-        public static RequestManager newRequest(Wrapper wrapper) {
+
+        public final static RequestManager newRequest(Wrapper wrapper) {
             return new Options(wrapper).new RequestManager();
         }
 
-        public class RequestManager {
+        public final class RequestManager {
 
             /**
              * Filter content type the file manager will display.
@@ -157,23 +230,25 @@ final public class FileManager {
             }
 
             public void startFileManager() {
+                onStart(null);
                 Intent intent = new Intent(wrapper.getContext(), FileManagerActivity.class);
+                intent.putExtra(Config.EXTRA_ID, Options.this.id);
                 intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                 wrapper.startActivity(intent);
-                options = null;
             }
 
             public void startFileManager(int requestCode) {
-                options = Options.this;
+                onStart(null);
                 Intent intent = new Intent(wrapper.getContext(), FileManagerActivity.class);
+                intent.putExtra(Config.EXTRA_ID, Options.this.id);
                 intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                 wrapper.startActivityForResult(intent, requestCode);
             }
 
             public void startFileManager(ResultCallback callback) {
-                options = Options.this;
-                Options.this.callback = callback;
+                onStart(callback);
                 Intent intent = new Intent(wrapper.getContext(), FileManagerActivity.class);
+                intent.putExtra(Config.EXTRA_ID, Options.this.id);
                 intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                 wrapper.startActivity(intent);
             }
@@ -185,13 +260,31 @@ final public class FileManager {
              * @param callback reslut to be delivered to
              */
             public void showDialogFileManager(ResultCallback callback) {
-                options = Options.this;
-                callbacks.add(callback);
-                Options.this.callback = callback;
-                DialogFragment fragment = FileManagerDialog.newInstance(mimeType, showHidden);
+                onStart(callback);
+                DialogFragment fragment = FileManagerDialog.newInstance(Options.this.id);
                 fragment.show(wrapper.getFragmentManager(), "FILE_MANAGER");
             }
 
+            private void onStart(ResultCallback callback) {
+                FileManager.getInstance().entities.put(Options.this.id, new RequestHolder(Options.this, callback));
+            }
+
+        }
+
+    }
+
+
+    final static class RequestHolder {
+        final ResultCallback callback;
+        final Options options;
+
+        public RequestHolder(@NonNull Options options, @Nullable ResultCallback callback) {
+            this.callback = callback;
+            this.options = options;
+        }
+
+        public int getId() {
+            return options.id;
         }
 
     }
@@ -208,6 +301,18 @@ final public class FileManager {
         String IMAGE = "image/*";
         String SOUND = "sound/*";
         String TEXT = "text/*";
+    }
+
+    interface Wrapper {
+
+        void startActivity(Intent intent);
+
+        void startActivityForResult(Intent intent, int requestCode);
+
+        FragmentManager getFragmentManager();
+
+        Context getContext();
+
     }
 
 

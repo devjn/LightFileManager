@@ -53,13 +53,11 @@ public class FileManagerDialog extends DialogFragment implements DataLoader.Data
     private String mName;
     private String parentPath;
 
-    private String mimeType;
-    private boolean showHidden;
+    private FileManager.RequestHolder requestHolder;
 
-    public static FileManagerDialog newInstance(String mimeType, boolean showHidden) {
+    public static FileManagerDialog newInstance(int requestId) {
         Bundle args = new Bundle();
-        args.putString("mimeType", mimeType);
-        args.putBoolean("showHidden", showHidden);
+        args.putInt(Config.EXTRA_ID, requestId);
 
         FileManagerDialog fragment = new FileManagerDialog();
         fragment.setArguments(args);
@@ -72,8 +70,7 @@ public class FileManagerDialog extends DialogFragment implements DataLoader.Data
         setRetainInstance(true);
         Bundle args = getArguments();
         if (args != null) {
-            this.mimeType = args.getString("mimeType", null);
-            this.showHidden = args.getBoolean("showHidden", false);
+            this.requestHolder = FileManager.getRequestHolder(args.getInt(Config.EXTRA_ID));
         }
     }
 
@@ -126,12 +123,12 @@ public class FileManagerDialog extends DialogFragment implements DataLoader.Data
         });
 
 
-        mAdapter = new FileListAdapter(getContext(), this, mData,
+        mAdapter = new FileListAdapter(requestHolder, this, mData,
                 getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
         mRecyclerView.setAdapter(mAdapter);
 
         parentPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File folder = new File(FileManager.getConfig().getDefaultFolder());
+        File folder = new File(requestHolder.options.getConfig().getDefaultFolder());
         if (!folder.exists() || !folder.isDirectory())
             folder = Environment.getExternalStorageDirectory();
 
@@ -158,7 +155,7 @@ public class FileManagerDialog extends DialogFragment implements DataLoader.Data
         if (file.isDirectory())
             loadData(file);
         else {
-            FileManager.deliverResult(file.getAbsolutePath());
+            FileManager.deliverResult(requestHolder.options.getId(), file.getAbsolutePath());
             dismiss();
         }
     }
@@ -172,7 +169,7 @@ public class FileManagerDialog extends DialogFragment implements DataLoader.Data
         mPath = folder.getPath();
         mName = folder.getName();
         mToolbar.setTitle(mName);
-        DataLoader.getInstance().loadData(folder, mimeType, showHidden);
+        DataLoader.getInstance().loadData(folder, requestHolder.options.getMimeType(), requestHolder.options.isShowHidden());
     }
 
 

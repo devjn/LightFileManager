@@ -23,12 +23,14 @@
 
 
     <!--    Preferences    -->
-    <string name="pref_directory">DEF_FOLDER</string>
+    <string name="pref_directory" translatable="false">DEF_FOLDER</string>
     <string name="pref_folder_count" translatable="false">pref_folder_count</string>
+    <string name="pref_hidden_shown" translatable="false">pref_hidden_shown</string>
 
     <string name="preferences_category_main">Main settings</string>
     <string name="preferences_directory_title">Set default directory</string>
     <string name="preferences_folder_count">Show folder items count</string>
+    <string name="preferences_hidden_shown">Show hidden items</string>
 
 
     <!--    Permissions    -->

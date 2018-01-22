@@ -29,7 +29,9 @@ import com.github.devjn.filemanager.utils.Utils;
 @SuppressWarnings("UnusedReturnValue")
 public class Config {
 
-    public static final String TAG = "FileManager";
+    static final String TAG = "FileManager";
+
+    static final String EXTRA_ID = "ID";
 
     public interface ImageManager {
         void load(ImageView imageView, FileData fileData);
@@ -47,7 +49,7 @@ public class Config {
     private boolean showFolderCount;
     private ImageManager imageLoader;
 
-    public Config() {
+    Config() {
         defaultFolder = Environment.getExternalStorageDirectory().getAbsolutePath();
         imageLoader = (ImageLoader) (imageView, fileData) -> {
             try {
@@ -56,6 +58,12 @@ public class Config {
                 e.printStackTrace();
             }
         };
+    }
+
+    Config(Config config) {
+        this.defaultFolder = config.defaultFolder;
+        this.showFolderCount = config.showFolderCount;
+        this.imageLoader = config.imageLoader;
     }
 
     public Config setDefaultFolder(String folder) {
