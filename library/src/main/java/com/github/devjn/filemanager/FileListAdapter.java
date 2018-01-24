@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.devjn.filemanager.utils.MimeTypeUtils;
+import com.github.devjn.filemanager.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +58,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
 
     @Override
     public RecyclerViewHolders onCreateViewHolder(ViewGroup parent, int viewType) {
-        View layoutView = LayoutInflater.from(parent.getContext()).inflate(isPortrait ? R.layout.list_item : R.layout.grid_item, parent, false);
+        View layoutView = LayoutInflater.from(parent.getContext()).inflate(ViewUtils.getViewForStyle(isPortrait), parent, false);
         return new RecyclerViewHolders(layoutView);
     }
 
@@ -121,6 +122,9 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         }
         return items;
     }
+
+
+
 
 
     class RecyclerViewHolders extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {

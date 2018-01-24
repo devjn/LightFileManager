@@ -47,6 +47,8 @@ public class Config {
 
     private String defaultFolder;
     private boolean showFolderCount;
+    @ViewStyle
+    private int displayViewStyle;
     private ImageManager imageLoader;
 
     Config() {
@@ -76,6 +78,11 @@ public class Config {
         return this;
     }
 
+    public Config setViewStyle(@ViewStyle int style) {
+        this.displayViewStyle = style;
+        return this;
+    }
+
     public Config setCustomImageLoader(ImageLoader loader) {
         this.imageLoader = loader;
         return this;
@@ -88,6 +95,10 @@ public class Config {
 
     public boolean isShowFolderCount() {
         return showFolderCount;
+    }
+
+    public int getDisplayFileStyle() {
+        return displayViewStyle;
     }
 
     public ImageManager getImageLoader() {

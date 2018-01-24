@@ -45,6 +45,7 @@ import android.widget.Toast;
 
 import com.github.devjn.filemanager.utils.IntentUtils;
 import com.github.devjn.filemanager.utils.Utils;
+import com.github.devjn.filemanager.utils.ViewUtils;
 
 import java.io.File;
 import java.io.Serializable;
@@ -86,6 +87,8 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     private String mName;
     private String mPath;
 
+    private boolean isPortrait;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,9 +111,10 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+
         mRecyclerView = mRootView.findViewById(R.id.list);
-        mLayoutManager = new GridLayoutManager(getContext(), getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? 1
-                : Utils.calculateNoOfColumns(getContext()), GridLayoutManager.VERTICAL, false);
+        mLayoutManager = ViewUtils.getLayoutManagerForStyle(getContext(), isPortrait);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
         return mRootView;
@@ -229,7 +233,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
                     getActivity().finish();
                 }
                 //TODO: There is a bug, which results in non null calling activity after coming back from another activity
-                else if (getActivity().getCallingActivity() != null) {
+                else if (getActivity().getCallingActivity() != null && requestHolder.getId() >= 0) {
                     Intent data = new Intent();
                     data.setData(Uri.parse(fileData.getPath()));
                     getActivity().setResult(Activity.RESULT_OK, data);

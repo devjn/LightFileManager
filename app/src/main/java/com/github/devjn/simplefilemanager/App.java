@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 
 import com.bumptech.glide.Glide;
 import com.github.devjn.filemanager.FileManager;
+import com.github.devjn.filemanager.ViewStyle;
 
 /**
  * Created by @author Jahongir on 24-Apr-17
@@ -35,7 +36,7 @@ public class App extends Application {
 
         FileManager.initialize(applicationContext);
         FileManager.getInstance().getConfig().setDefaultFolder(App.getDefaultFolder())
-                .setShowFolderCount(App.getShowFolderCount()).showHidden(App.getShowHidden())
+                .setShowFolderCount(App.getShowFolderCount()).showHidden(App.getShowHidden()).setViewStyle(ViewStyle.DEFAULT_GRID)
                 .setCustomImageLoader((imageView, fileData) -> Glide.with(imageView.getContext()).load(fileData.getPath()).into(imageView));
 
         FileManager.setIconForExtension("apk", R.drawable.ic_apk);
