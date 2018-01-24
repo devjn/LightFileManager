@@ -48,8 +48,10 @@
     <string name="multiple_files">Multiple files</string>
     <string name="folder">Folder</string>
     <string name="file">File</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="share_via">Share via</string>
+    <string name="action_view">View</string>
+    <string name="action_new">New</string>
 
 
 </resources>

@@ -57,8 +57,7 @@ public class Utils {
     public static int calculateNoOfColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int noOfColumns = (int) (dpWidth / 110);
-        return noOfColumns;
+        return (int) (dpWidth / 88);
     }
 
     public static String humanReadableByteCount(long bytes, boolean si) {

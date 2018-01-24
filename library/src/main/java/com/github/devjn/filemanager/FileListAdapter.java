@@ -126,7 +126,6 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
 
 
 
-
     class RecyclerViewHolders extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         TextView name;

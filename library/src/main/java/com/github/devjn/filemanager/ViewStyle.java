@@ -13,12 +13,12 @@ import static com.github.devjn.filemanager.ViewStyle.*;
  * ViewStyle
  */
 @Retention(RetentionPolicy.SOURCE)
-@IntDef({AUTO, DEFAULT_GRID, DeFAULT_LIST})
+@IntDef({AUTO, DEFAULT_GRID, DEFAULT_LIST})
 public @interface ViewStyle {
 
     int AUTO = 0;
 
     int DEFAULT_GRID = 10;
-    int DeFAULT_LIST = 20;
+    int DEFAULT_LIST = 20;
 
 }

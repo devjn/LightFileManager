@@ -19,10 +19,9 @@ public class ViewUtils {
     public static GridLayoutManager getLayoutManagerForStyle(Context context, boolean isPortrait) {
         @ViewStyle int style = FileManager.getInstance().getConfig().getDisplayFileStyle();
         switch (style) {
-
             case ViewStyle.DEFAULT_GRID:
                 return new GridLayoutManager(context, Utils.calculateNoOfColumns(context), GridLayoutManager.VERTICAL, false);
-            case ViewStyle.DeFAULT_LIST:
+            case ViewStyle.DEFAULT_LIST:
                 return new GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false);
             case ViewStyle.AUTO:
             default:
@@ -33,12 +32,11 @@ public class ViewUtils {
     public static int getViewForStyle(boolean isPortrait) {
         @ViewStyle int style = FileManager.getInstance().getConfig().getDisplayFileStyle();
         switch (style) {
-            case ViewStyle.AUTO:
-                return isPortrait ? R.layout.list_item : R.layout.grid_item;
             case ViewStyle.DEFAULT_GRID:
                 return R.layout.grid_item;
-            case ViewStyle.DeFAULT_LIST:
+            case ViewStyle.DEFAULT_LIST:
                 return R.layout.list_item;
+            case ViewStyle.AUTO:
             default:
                 return isPortrait ? R.layout.list_item : R.layout.grid_item;
         }
