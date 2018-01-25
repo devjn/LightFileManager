@@ -114,10 +114,10 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
+        mRecyclerView = mRootView.findViewById(R.id.list);
 
         isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 
-        mRecyclerView = mRootView.findViewById(R.id.list);
         mLayoutManager = ViewUtils.getLayoutManagerForStyle(getContext(), isPortrait);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayoutManager);

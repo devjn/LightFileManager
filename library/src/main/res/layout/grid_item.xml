@@ -16,14 +16,14 @@
   -->
 
 <com.github.devjn.filemanager.utils.ForegroundLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="@dimen/spacing_small"
-    android:background="@drawable/statelist_focusable_item_background"
-    android:foreground="?attr/selectableItemBackground"
-    android:orientation="vertical"
-    android:padding="@dimen/spacing_small">
+                                                           xmlns:tools="http://schemas.android.com/tools"
+                                                           android:layout_width="match_parent"
+                                                           android:layout_height="wrap_content"
+                                                           android:layout_margin="@dimen/spacing_micro"
+                                                           android:background="@drawable/statelist_focusable_item_background"
+                                                           android:foreground="?attr/selectableItemBackground"
+                                                           android:orientation="vertical"
+                                                           android:padding="@dimen/spacing_small">
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -36,7 +36,7 @@
             android:layout_height="56dp"
             android:gravity="center"
             android:scaleType="centerCrop"
-            tools:src="@drawable/ic_file" />
+            tools:src="@drawable/ic_file"/>
 
         <TextView
             android:id="@+id/size"
@@ -47,7 +47,7 @@
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            tools:text="0" />
+            tools:text="0"/>
     </FrameLayout>
 
     <com.github.devjn.filemanager.utils.AutoResizeTextView
@@ -56,5 +56,5 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:maxHeight="56dp"
-        tools:text="Name" />
+        tools:text="Name"/>
 </com.github.devjn.filemanager.utils.ForegroundLinearLayout>

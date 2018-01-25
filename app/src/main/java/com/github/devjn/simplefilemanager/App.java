@@ -21,8 +21,6 @@ public class App extends Application {
     public static final String TAG = "SimpleFileManager";
     public static volatile Context applicationContext = null;
 
-    public static String FILES_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileprovider";
-
     private static SharedPreferences prefs;
 
     private static String DEF_FOLDER = "DEF_FOLDER";
@@ -37,7 +35,8 @@ public class App extends Application {
         FileManager.initialize(applicationContext);
         FileManager.getInstance().getConfig().setDefaultFolder(App.getDefaultFolder())
                 .setShowFolderCount(App.getShowFolderCount()).showHidden(App.getShowHidden()).setViewStyle(ViewStyle.DEFAULT_GRID)
-                .setCustomImageLoader((imageView, fileData) -> Glide.with(imageView.getContext()).load(fileData.getPath()).into(imageView));
+                .setCustomImageLoader((imageView, fileData) ->
+                        Glide.with(imageView.getContext()).load(fileData.getPath()).asBitmap().error(R.drawable.ic_broken_image).into(imageView));
 
         FileManager.setIconForExtension("apk", R.drawable.ic_apk);
     }
