@@ -43,11 +43,13 @@ import java.util.Collections;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
-public class FileManagerActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
+public class FileManagerActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, ListFilesFragment.FragmentStateListener {
 
     private static int REQUEST_WRITE = 100;
 
     FileManager.RequestHolder requestHolder;
+
+    private String currentPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,5 +187,17 @@ public class FileManagerActivity extends AppCompatActivity implements FragmentMa
             return FileManager.getInstance().getConfig();
         } else return requestHolder.options.getConfig();
     }
+
+    public String getCurrentPath() {
+        return currentPath;
+    }
+
+    @Override
+    public void onFragmentResume(String path) {
+        this.currentPath = path;
+    }
+
+
+
 
 }

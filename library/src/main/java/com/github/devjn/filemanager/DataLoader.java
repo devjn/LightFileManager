@@ -29,8 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -39,6 +41,11 @@ import io.reactivex.schedulers.Schedulers;
  * DataLoader
  */
 public class DataLoader {
+
+    public @interface FileType {
+        int FILE = 0;
+        int FOLDER = 1;
+    }
 
     public interface DataListener {
         void onDataLoad(@NonNull List<FileData> list);
@@ -60,6 +67,7 @@ public class DataLoader {
     }
 
     private DataListener listener = null;
+    private Disposable disposableDataLoad = null;
 
     public void setListener(DataListener listener) {
         this.listener = listener;
@@ -71,8 +79,11 @@ public class DataLoader {
     }
 
     public void loadData(File folder) {
-        Observable<List<FileData>> observe = Observable.fromCallable(() -> fill(folder));
-        observe.subscribeOn(Schedulers.io())
+        if (disposableDataLoad != null && !disposableDataLoad.isDisposed()) {
+            disposableDataLoad.dispose();
+        }
+        disposableDataLoad = Observable.fromCallable(() -> fill(folder))
+                .subscribeOn(Schedulers.io())
                 .flatMap(Observable::fromIterable)
                 .toSortedList()
                 .subscribeOn(Schedulers.computation())
@@ -85,8 +96,11 @@ public class DataLoader {
     }
 
     public void loadData(File folder, String mime, boolean showHidden) {
-        Observable<List<FileData>> observe = Observable.fromCallable(() -> fill(folder, mime, showHidden));
-        observe.subscribeOn(Schedulers.io())
+        if (disposableDataLoad != null && !disposableDataLoad.isDisposed()) {
+            disposableDataLoad.dispose();
+        }
+        disposableDataLoad = Observable.fromCallable(() -> fill(folder, mime, showHidden))
+                .subscribeOn(Schedulers.io())
                 .flatMap(Observable::fromIterable)
                 .toSortedList()
                 .subscribeOn(Schedulers.computation())
@@ -162,6 +176,21 @@ public class DataLoader {
         return true;
     }
 
+
+    public void createFile(Activity activity, String parent, String name, int type) {
+        if (name.isEmpty()) return;
+        Completable.create(e -> {
+            File file = new File(parent, name);
+            if (type == 0) {
+                file.createNewFile();
+            } else {
+                file.mkdir();
+            }
+        }).subscribeOn(Schedulers.io())
+                .subscribe(() -> {
+                }, e -> Log.e(Config.TAG, "Failed to create file: " + parent + " " + name, e));
+    }
+
     public void deleteSelectedFiles(Activity activity, List<Integer> selectedItems, List<? extends FileData> data, String path) {
         final AtomicInteger deletedCount = new AtomicInteger(0);
         Observable.fromIterable(selectedItems)
@@ -171,11 +200,11 @@ public class DataLoader {
                         File file = new File(data.get(i).getPath());
                         deletedCount.addAndGet(deleteRecursive(file));
                     } catch (Exception e) {
-                        Log.e(Config.TAG, "Failed to delete file" + e);
+                        Log.e(Config.TAG, "Failed to delete file", e);
                     }
-                }, e -> Log.e(Config.TAG, "Failed to delete file" + e), () ->
+                }, e -> Log.e(Config.TAG, "Failed to delete file", e), () ->
                         activity.runOnUiThread(() -> {
-                            Toast.makeText(activity, deletedCount.get() + "files deleted", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, deletedCount.get() + " files deleted", Toast.LENGTH_SHORT).show();
                             loadData(new File(path));
                         }));
     }

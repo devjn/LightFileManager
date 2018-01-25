@@ -13,6 +13,16 @@ import android.widget.ArrayAdapter;
 
 public class Utils {
 
+    private static float density = 1;
+
+    static {
+        density = App.applicationContext.getResources().getDisplayMetrics().density;
+    }
+
+    public static int dp(float value) {
+        return (int) Math.ceil(density * value);
+    }
+
     public static void showListDialog(Context context, String[] items, DialogInterface.OnClickListener listener) {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.dialog_select_item, items);
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.Theme_AppCompat_Light_Dialog_Alert);

@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.FileObserver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -82,6 +83,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     private ActionMode actionMode;
     private List<Integer> mSelectedActionItems;
     private FileManager.RequestHolder requestHolder;
+    private MyFileObserver mFileObserver;
 
     private List<? extends FileData> mData;
     private String mName;
@@ -102,8 +104,10 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
             mPath = args.getString(FOLDER_KEY);
             mName = args.getString(NAME_KEY, "");
             if (!args.getBoolean(LOAD)) return;
-            if (mPath != null && !mPath.isEmpty())
+            if (mPath != null && !mPath.isEmpty()) {
+                mFileObserver = new MyFileObserver(mPath);
                 loadData();
+            }
         }
     }
 
@@ -150,7 +154,10 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     @Override
     public void onResume() {
         super.onResume();
+        if (getActivity() instanceof FragmentStateListener)
+            ((FragmentStateListener) getActivity()).onFragmentResume(mPath);
         DataLoader.getInstance().setListener(this);
+        mFileObserver.startWatching();
         if (mPath != null && !mPath.isEmpty())
             loadData();
     }
@@ -159,6 +166,7 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
     public void onPause() {
         super.onPause();
         DataLoader.getInstance().removeListener(this);
+        mFileObserver.stopWatching();
     }
 
     @Override
@@ -440,6 +448,34 @@ public class ListFilesFragment extends Fragment implements DataLoader.DataListen
             }
         }
 
+    }
+
+
+    class MyFileObserver extends FileObserver {
+        static final int mask = (FileObserver.CREATE |
+                FileObserver.DELETE |
+                FileObserver.DELETE_SELF |
+                FileObserver.MODIFY |
+                FileObserver.MOVED_FROM |
+                FileObserver.MOVED_TO |
+                FileObserver.MOVE_SELF);
+
+        MyFileObserver(String path) {
+            super(path, mask);
+        }
+
+        @Override
+        public void onEvent(int event, String path) {
+            if (path == null) {
+                return;
+            }
+            loadData();
+        }
+    }
+
+
+    interface FragmentStateListener {
+        void onFragmentResume(String path);
     }
 
 }

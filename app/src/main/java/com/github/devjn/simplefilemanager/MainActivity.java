@@ -29,12 +29,9 @@ public class MainActivity extends FileManagerActivity {
         final int id = item.getItemId();
         switch (id) {
             case R.id.action_new:
-                String[] options = new String[] {"File", "Folder"};
-                Utils.showListDialog(this, options, (dialog, which) -> {
-                    switch (which) {
-
-                    }
-                });
+                String[] options = new String[]{"File", "Folder"};
+                Utils.showListDialog(this, options, (dialog, which) -> DialogNewItem.Companion.show(getSupportFragmentManager(), which, getCurrentPath()));
+                return true;
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
