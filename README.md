@@ -2,7 +2,9 @@
 Lightweight embeddable File Manager
 
 ## Example
-You can see this library in action inside [MereFileExplorer](https://github.com/devjn/MereFileExplorer)
+The example located in :app module.
+
+To see this library in action you can refer to [MereFileExplorer](https://github.com/devjn/MereFileExplorer) which is built on top of this project.
 
 ## Installation
 
@@ -15,3 +17,31 @@ dependencies {
 }
 ```
 ## Usage
+
+First, FileManager needs to be initialized, the good place for this is Application class inside `onCreate`:
+
+```java
+FileManager.initialize(applicationContext);
+```
+
+Example of starting file manager for select content:
+
+```java
+FileManager.with(this).showHidden(false).setContentType("image/*")
+        .startFileManager(path -> someCallback());
+```
+It's also possible to use file manager as dialog window:
+
+```java
+FileManager.with(this).showHidden(false).setContentType(FileManager.Filter.IMAGE)
+        .showDialogFileManager(path -> Toast.makeText(context, "onResult: " + path, Toast.LENGTH_SHORT).show());
+```
+
+#### Config
+
+To configure file manager use `FileManager.getInstance().getConfig()`
+
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE.md](LICENSE.md) file for details
