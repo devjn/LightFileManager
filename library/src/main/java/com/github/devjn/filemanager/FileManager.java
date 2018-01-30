@@ -29,6 +29,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.github.devjn.filemanager.utils.MimeTypeUtils;
+import com.github.devjn.filemanager.utils.ViewUtils;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -74,6 +75,7 @@ public final class FileManager {
 
     public static void initialize(Context context) {
         FileManagerFileProvider.updateAuthority(context.getApplicationContext().getPackageName());
+        ViewUtils.init(context);
     }
 
 //    public static void initialize(Context context, Config config) {

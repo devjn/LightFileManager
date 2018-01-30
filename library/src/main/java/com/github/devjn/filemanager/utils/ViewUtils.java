@@ -13,8 +13,13 @@ import com.github.devjn.filemanager.ViewStyle;
  * ViewUtils
  */
 
-public class ViewUtils {
+public final class ViewUtils {
 
+    public static float density = 1;
+
+    public static void init(Context context) {
+        density = context.getResources().getDisplayMetrics().density;
+    }
 
     public static GridLayoutManager getLayoutManagerForStyle(Context context, boolean isPortrait) {
         @ViewStyle int style = FileManager.getInstance().getConfig().getDisplayFileStyle();
@@ -40,6 +45,10 @@ public class ViewUtils {
             default:
                 return isPortrait ? R.layout.list_item : R.layout.grid_item;
         }
+    }
+
+    public static int dp(float value) {
+        return (int) Math.ceil(density * value);
     }
 
 }

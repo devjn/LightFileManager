@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<com.github.devjn.filemanager.utils.ForegroundLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.github.devjn.filemanager.components.ForegroundLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                                            xmlns:tools="http://schemas.android.com/tools"
                                                            android:layout_width="match_parent"
                                                            android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:gravity="center"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             tools:src="@drawable/ic_file"/>
 
         <TextView
@@ -50,11 +50,11 @@
             tools:text="0"/>
     </FrameLayout>
 
-    <com.github.devjn.filemanager.utils.AutoResizeTextView
+    <com.github.devjn.filemanager.components.AutoResizeTextView
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:maxHeight="56dp"
         tools:text="Name"/>
-</com.github.devjn.filemanager.utils.ForegroundLinearLayout>
+</com.github.devjn.filemanager.components.ForegroundLinearLayout>

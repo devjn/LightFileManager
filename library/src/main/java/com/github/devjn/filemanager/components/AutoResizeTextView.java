@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.devjn.filemanager.utils;
+package com.github.devjn.filemanager.components;
 
 import android.content.Context;
 import android.text.Layout.Alignment;

@@ -19,14 +19,13 @@ package com.github.devjn.filemanager;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.devjn.filemanager.components.FileViewListItem;
 import com.github.devjn.filemanager.utils.MimeTypeUtils;
-import com.github.devjn.filemanager.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +57,8 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
 
     @Override
     public RecyclerViewHolders onCreateViewHolder(ViewGroup parent, int viewType) {
-        View layoutView = LayoutInflater.from(parent.getContext()).inflate(ViewUtils.getViewForStyle(isPortrait), parent, false);
-        return new RecyclerViewHolders(layoutView);
+//        View layoutView = LayoutInflater.from(parent.getContext()).inflate(ViewUtils.getViewForStyle(isPortrait), parent, false);
+        return new RecyclerViewHolders(new FileViewListItem(parent.getContext()));
     }
 
     @Override
@@ -73,7 +72,6 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
         FileData fileData = itemList.get(position);
         String name = fileData.getName();
         holder.name.setText(name);
-        holder.name.setTextSize(14);
         if (name.startsWith("."))
             holder.picture.setAlpha(0.5f);
         else holder.picture.setAlpha(1.0f);
@@ -124,21 +122,19 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.Recycl
     }
 
 
-
-
     class RecyclerViewHolders extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         TextView name;
         TextView size;
         ImageView picture;
 
-        RecyclerViewHolders(View itemView) {
+        RecyclerViewHolders(FileViewListItem itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
-            name = itemView.findViewById(R.id.name);
-            size = itemView.findViewById(R.id.size);
-            picture = itemView.findViewById(R.id.imageView);
+            name = itemView.getTextName();
+            size = itemView.getTextCount();
+            picture = itemView.getImageCover();
         }
 
         @Override
