@@ -24,6 +24,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -54,7 +55,7 @@ public class FileManagerActivity extends AppCompatActivity implements FragmentMa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_file_manager);
+        setContentView(getContentView());
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -65,6 +66,11 @@ public class FileManagerActivity extends AppCompatActivity implements FragmentMa
         if (savedInstanceState == null && PermissionUtils.isWriteGranted(this)) {
             addFragments();
         }
+    }
+
+    @LayoutRes
+    protected int getContentView() {
+        return R.layout.activity_file_manager;
     }
 
     @Override
@@ -196,8 +202,6 @@ public class FileManagerActivity extends AppCompatActivity implements FragmentMa
     public void onFragmentResume(String path) {
         this.currentPath = path;
     }
-
-
 
 
 }
